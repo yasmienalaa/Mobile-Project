@@ -2,4 +2,9 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="sage_primary">#789B85</color>
+    <color name="sage_background">#F7F8F3</color>
+    <color name="sage_secondary">#DCE8DF</color>
+    <color name="sage_accent">#D9B88F</color>
+    <color name="sage_text">#34443A</color>
 </resources>
