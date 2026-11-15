@@ -1,0 +1,61 @@
+{
+  "users": [
+    {"key":"nadia","fullName":"Nadia Hassan","email":"nadia@softsage.test","password":"Demo123!","role":"STUDENT","level":"BEGINNER","preferredLanguages":["Kotlin","Python"]},
+    {"key":"omar","fullName":"Omar Adel","email":"omar@softsage.test","password":"Demo123!","role":"STUDENT","level":"INTERMEDIATE","preferredLanguages":["JavaScript","Java"]},
+    {"key":"admin","fullName":"Soft Sage Admin","email":"admin@softsage.test","password":"Demo123!","role":"ADMIN","level":"ADVANCED","preferredLanguages":["Kotlin","Python","JavaScript"]}
+  ],
+  "courses": [
+    {
+      "key":"kotlin","title":"Kotlin Foundations","description":"Learn the language behind modern Android apps, one clear concept at a time.","language":"Kotlin","level":"BEGINNER",
+      "lessons":[
+        {"title":"Your first Kotlin program","contentType":"TEXT","content":"Kotlin is concise, expressive, and designed to work well on the JVM. Start with fun main() and print()."},
+        {"title":"Values and variables","contentType":"TEXT","content":"Use val for values that do not change and var for values that can be reassigned."},
+        {"title":"Functions and parameters","contentType":"VIDEO","content":"Functions group reusable steps and can return a value.","videoUrl":"https://example.com/demo/kotlin-functions"}
+      ],
+      "quiz":{"title":"Kotlin Foundations Checkpoint","description":"A short check on the first Kotlin lessons.","questions":[
+        {"questionText":"Which keyword declares a read-only value?","optionA":"val","optionB":"var","optionC":"fun","optionD":"class","correctOption":"A","points":1},
+        {"questionText":"Which keyword starts a function declaration?","optionA":"let","optionB":"fun","optionC":"new","optionD":"def","correctOption":"B","points":1},
+        {"questionText":"What does JVM stand for?","optionA":"Java Variable Method","optionB":"Joint Value Machine","optionC":"Java Virtual Machine","optionD":"Java Version Manager","correctOption":"C","points":1}
+      ]}
+    },
+    {
+      "key":"python","title":"Python for Curious Minds","description":"Practice useful Python basics through friendly examples and small programs.","language":"Python","level":"BEGINNER",
+      "lessons":[
+        {"title":"Meet Python","contentType":"TEXT","content":"Python is a readable general-purpose language used for scripting, data, and web development."},
+        {"title":"Collections and loops","contentType":"TEXT","content":"Lists hold ordered values. A for loop visits each item in a collection."},
+        {"title":"Write a small function","contentType":"TEXT","content":"Use def to define a function, then call it with the values it needs."}
+      ],
+      "quiz":{"title":"Python Basics Checkpoint","description":"Review names, lists, and functions.","questions":[
+        {"questionText":"Which keyword defines a function in Python?","optionA":"fun","optionB":"def","optionC":"function","optionD":"method","correctOption":"B","points":1},
+        {"questionText":"Which collection keeps items in order and can be changed?","optionA":"List","optionB":"Tuple","optionC":"Integer","optionD":"Boolean","correctOption":"A","points":1}
+      ]}
+    },
+    {
+      "key":"javascript","title":"Web Pages with JavaScript","description":"Add behavior to web pages with events, values, and simple functions.","language":"JavaScript","level":"INTERMEDIATE",
+      "lessons":[
+        {"title":"Values in JavaScript","contentType":"TEXT","content":"JavaScript supports strings, numbers, booleans, arrays, and objects."},
+        {"title":"Respond to a click","contentType":"VIDEO","content":"An event listener lets a page respond when a learner interacts with it.","videoUrl":"https://example.com/demo/javascript-events"},
+        {"title":"Small reusable functions","contentType":"TEXT","content":"Functions let you name and reuse steps in a program."}
+      ],
+      "quiz":{"title":"JavaScript Web Checkpoint","description":"Check the essentials of browser-side JavaScript.","questions":[
+        {"questionText":"Which method listens for a browser event?","optionA":"watchEvent()","optionB":"addEventListener()","optionC":"onListen()","optionD":"eventLoop()","correctOption":"B","points":1},
+        {"questionText":"Which value represents true or false?","optionA":"Boolean","optionB":"Array","optionC":"String","optionD":"Object","correctOption":"A","points":1}
+      ]}
+    }
+  ],
+  "enrollments": [
+    {"student":"nadia","course":"kotlin"},
+    {"student":"nadia","course":"python"},
+    {"student":"omar","course":"javascript"}
+  ],
+  "progress": [
+    {"student":"nadia","course":"kotlin","lessonPosition":0,"completed":true},
+    {"student":"nadia","course":"kotlin","lessonPosition":1,"completed":false},
+    {"student":"nadia","course":"python","lessonPosition":0,"completed":true},
+    {"student":"omar","course":"javascript","lessonPosition":0,"completed":true}
+  ],
+  "quizResults": [
+    {"student":"nadia","course":"kotlin","score":2,"maxScore":3,"answers":["A","B","A"]},
+    {"student":"omar","course":"javascript","score":2,"maxScore":2,"answers":["B","A"]}
+  ]
+}
