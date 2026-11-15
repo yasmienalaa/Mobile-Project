@@ -13,7 +13,7 @@
         <activity android:name=".LessonDetailsActivity" android:exported="false" />
         <activity android:name=".CourseDetailsActivity" android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".HomeActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
