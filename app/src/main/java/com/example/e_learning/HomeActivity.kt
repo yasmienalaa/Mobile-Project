@@ -16,10 +16,9 @@ import com.example.e_learning.database.AppDatabase
 import com.example.e_learning.entities.UserEntity
 import com.example.e_learning.ui.AdminCoursesScreen
 import com.example.e_learning.ui.CourseDialogs
-import com.example.e_learning.ui.ProfileScreen
 import com.example.e_learning.ui.StudentCoursesScreen
 
-class MainActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity() {
     private lateinit var repository: CourseRepository
     private lateinit var dialogs: CourseDialogs
     private lateinit var database: AppDatabase
@@ -28,7 +27,6 @@ class MainActivity : AppCompatActivity() {
     private var currentStudent: UserEntity? = null
     private var studentScreen: StudentCoursesScreen? = null
     private var adminScreen: AdminCoursesScreen? = null
-    private var profileScreen: ProfileScreen? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +60,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showCourses() {
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_home)
         val roleToggle = findViewById<TextView>(R.id.roleToggle)
         val screenContainer = findViewById<FrameLayout>(R.id.screenContainer)
         roleToggle.text = if (isAdmin) "Admin mode" else "Student mode"
@@ -83,7 +81,6 @@ class MainActivity : AppCompatActivity() {
                 onDeleteCourse = dialogs::confirmDelete
             )
             studentScreen = null
-            profileScreen = null
             screenContainer.addView(adminScreen!!.createView())
         } else {
             when (selectedTab) {
@@ -92,7 +89,6 @@ class MainActivity : AppCompatActivity() {
                         openCourseOrEnroll(course, enrolled)
                     }
                     adminScreen = null
-                    profileScreen = null
                     screenContainer.addView(studentScreen!!.createView())
                 }
                 ENROLLED_TAB -> {
@@ -100,15 +96,11 @@ class MainActivity : AppCompatActivity() {
                         openCourseOrEnroll(course, enrolled)
                     }
                     adminScreen = null
-                    profileScreen = null
                     screenContainer.addView(studentScreen!!.createView())
                 }
                 PROFILE_TAB -> {
                     studentScreen = null
                     adminScreen = null
-                    profileScreen = ProfileScreen(this)
-                    screenContainer.addView(profileScreen!!.createView())
-                    profileScreen?.render(currentStudent)
                 }
             }
         }
@@ -163,7 +155,6 @@ class MainActivity : AppCompatActivity() {
                             if (selectedTab == ENROLLED_TAB) enrolledCourses else allCourses,
                             enrolledIds
                         )
-                        profileScreen?.render(currentStudent)
                     }.onFailure { showLoadError() }
                 }
             }.onFailure { showLoadError() }
@@ -180,5 +171,3 @@ class MainActivity : AppCompatActivity() {
         private const val PROFILE_TAB = "profile"
     }
 }
-
-
