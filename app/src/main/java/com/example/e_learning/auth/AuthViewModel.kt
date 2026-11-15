@@ -42,7 +42,11 @@ class AuthViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun updateProfile(user: UserEntity, onDone: () -> Unit) {
-        viewModelScope.launch { repo.updateProfile(user); onDone() }
+        viewModelScope.launch {
+            repo.updateProfile(user)
+            session.save(user)
+            onDone()
+        }
     }
 
     fun logout() = session.clear()
