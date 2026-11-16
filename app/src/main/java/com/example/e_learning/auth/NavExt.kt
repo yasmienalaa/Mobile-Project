@@ -1,24 +1,27 @@
 package com.example.e_learning.auth
 
+import android.content.Intent
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
-import com.example.e_learning.R
+import com.example.e_learning.HomeActivity
+import com.example.e_learning.MainActivity
 import com.google.android.material.transition.MaterialFadeThrough
 
 fun Fragment.goHome(role: String) {
-    val destination =
-        if (role == Role.ADMIN) R.id.adminHomeFragment else R.id.studentHomeFragment
-    findNavController().navigate(destination, null, navOptions {
-        popUpTo(R.id.loginFragment) { inclusive = true }
-    })
+    val context = requireContext()
+    val intent = Intent(context, HomeActivity::class.java).apply {
+        putExtra("IS_ADMIN", role == Role.ADMIN)
+    }
+    startActivity(intent)
+    requireActivity().finish()
 }
 
 fun Fragment.goToLogin() {
-    val nav = findNavController()
-    nav.navigate(R.id.loginFragment, null, navOptions {
-        popUpTo(nav.graph.id) { inclusive = true }
-    })
+    val context = requireContext()
+    val intent = Intent(context, MainActivity::class.java).apply {
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+    }
+    startActivity(intent)
+    requireActivity().finish()
 }
 
 fun String.pretty(): String = lowercase().replaceFirstChar { it.uppercase() }
@@ -29,3 +32,4 @@ fun Fragment.applyFadeThrough() {
     reenterTransition = MaterialFadeThrough()
     returnTransition = MaterialFadeThrough()
 }
+

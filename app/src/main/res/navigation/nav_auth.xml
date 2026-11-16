@@ -12,8 +12,4 @@
         android:name="com.example.e_learning.auth.ProfileFragment" android:label="Profile" />
     <fragment android:id="@+id/editProfileFragment"
         android:name="com.example.e_learning.auth.EditProfileFragment" android:label="Edit profile" />
-    <fragment android:id="@+id/studentHomeFragment"
-        android:name="com.example.e_learning.auth.StudentHomeFragment" android:label="Student home" />
-    <fragment android:id="@+id/adminHomeFragment"
-        android:name="com.example.e_learning.auth.AdminHomeFragment" android:label="Admin home" />
 </navigation>

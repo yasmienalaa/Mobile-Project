@@ -1,0 +1,59 @@
+Index: gradle/libs.versions.toml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>[versions]\r\nagp = \"9.4.1\"\r\ncoreKtx = \"1.19.1\"\r\njunit = \"4.13.2\"\r\njunitVersion = \"1.3.0\"\r\nespressoCore = \"3.7.0\"\r\nappcompat = \"1.8.0\"\r\nmaterial = \"1.14.0\"\r\nactivityKtx = \"1.13.0\"\r\nconstraintlayout = \"2.2.2\"\r\nksp = \"2.3.10\"\r\nroom = \"2.8.5\"\r\nfragmentKtx = \"1.8.5\"\r\nnavigation = \"2.8.4\"\r\nlifecycle = \"2.8.7\"\r\n\r\n[libraries]\r\nandroidx-core-ktx = { group = \"androidx.core\", name = \"core-ktx\", version.ref = \"coreKtx\" }\r\njunit = { group = \"junit\", name = \"junit\", version.ref = \"junit\" }\r\nandroidx-junit = { group = \"androidx.test.ext\", name = \"junit\", version.ref = \"junitVersion\" }\r\nandroidx-espresso-core = { group = \"androidx.test.espresso\", name = \"espresso-core\", version.ref = \"espressoCore\" }\r\nandroidx-appcompat = { group = \"androidx.appcompat\", name = \"appcompat\", version.ref = \"appcompat\" }\r\nmaterial = { group = \"com.google.android.material\", name = \"material\", version.ref = \"material\" }\r\nandroidx-activity-ktx = { group = \"androidx.activity\", name = \"activity-ktx\", version.ref = \"activityKtx\" }\r\nandroidx-constraintlayout = { group = \"androidx.constraintlayout\", name = \"constraintlayout\", version.ref = \"constraintlayout\" }\r\nandroidx-room-runtime = { group = \"androidx.room\", name = \"room-runtime\", version.ref = \"room\" }\r\nandroidx-room-ktx = { group = \"androidx.room\", name = \"room-ktx\", version.ref = \"room\" }\r\nandroidx-room-compiler = { group = \"androidx.room\", name = \"room-compiler\", version.ref = \"room\" }\r\nandroidx-fragment-ktx = { group = \"androidx.fragment\", name = \"fragment-ktx\", version.ref = \"fragmentKtx\" }\r\nandroidx-navigation-fragment-ktx = { group = \"androidx.navigation\", name = \"navigation-fragment-ktx\", version.ref = \"navigation\" }\r\nandroidx-navigation-ui-ktx = { group = \"androidx.navigation\", name = \"navigation-ui-ktx\", version.ref = \"navigation\" }\r\nandroidx-lifecycle-viewmodel-ktx = { group = \"androidx.lifecycle\", name = \"lifecycle-viewmodel-ktx\", version.ref = \"lifecycle\" }\r\nandroidx-lifecycle-livedata-ktx = { group = \"androidx.lifecycle\", name = \"lifecycle-livedata-ktx\", version.ref = \"lifecycle\" }\r\n\r\n[plugins]\r\nandroid-application = { id = \"com.android.application\", version.ref = \"agp\" }\r\nksp = { id = \"com.google.devtools.ksp\", version.ref = \"ksp\" }
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/gradle/libs.versions.toml b/gradle/libs.versions.toml
+--- a/gradle/libs.versions.toml	(revision 90c99ecbc194cf806eab38b70cd4a2d5cfed96fc)
++++ b/gradle/libs.versions.toml	(date 1794775462596)
+@@ -1,5 +1,5 @@
+ [versions]
+-agp = "9.4.1"
++agp = "9.3.0"
+ coreKtx = "1.19.1"
+ junit = "4.13.2"
+ junitVersion = "1.3.0"
+Index: gradle.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># Project-wide Gradle settings.\r\n# IDE (e.g. Android Studio) users:\r\n# Gradle settings configured through the IDE *will override*\r\n# any settings specified in this file.\r\n# For more details on how to configure your build environment visit\r\n# http://www.gradle.org/docs/current/userguide/build_environment.html\r\n# Specifies the JVM arguments used for the daemon process.\r\n# The setting is particularly useful for tweaking memory settings.\r\norg.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8\r\n# When configured, Gradle will run in incubating parallel mode.\r\n# This option should only be used with decoupled projects. For more details, visit\r\n# https://developer.android.com/r/tools/gradle-multi-project-decoupled-projects\r\n# org.gradle.parallel=true\r\n# When enabled, the Configuration Cache allows Gradle to skip the configuration\r\n# phase entirely if nothing that affects the build configuration (such as build scripts)\r\n# has changed. Additionally, Gradle applies performance optimizations to task execution.\r\norg.gradle.configuration-cache=true\r\n# Kotlin code style for this project: \"official\" or \"obsolete\":\r\nkotlin.code.style=official
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/gradle.properties b/gradle.properties
+--- a/gradle.properties	(revision 90c99ecbc194cf806eab38b70cd4a2d5cfed96fc)
++++ b/gradle.properties	(date 1794776116435)
+@@ -16,4 +16,5 @@
+ # has changed. Additionally, Gradle applies performance optimizations to task execution.
+ org.gradle.configuration-cache=true
+ # Kotlin code style for this project: "official" or "obsolete":
+-kotlin.code.style=official
+\ No newline at end of file
++kotlin.code.style=official
++android.r8.gradual.support=true
+\ No newline at end of file
+Index: .idea/deploymentTargetSelector.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"deploymentTargetSelector\">\r\n    <selectionStates>\r\n      <SelectionState runConfigName=\"app\">\r\n        <option name=\"selectionMode\" value=\"DROPDOWN\" />\r\n        <DropdownSelection timestamp=\"2026-11-14T23:19:13.984612400Z\">\r\n          <Target type=\"DEFAULT_BOOT\">\r\n            <handle>\r\n              <DeviceId pluginId=\"PhysicalDevice\" identifier=\"serial=MFLZAQPBDIO7MJMF\" />\r\n            </handle>\r\n          </Target>\r\n        </DropdownSelection>\r\n        <DialogSelection />\r\n      </SelectionState>\r\n    </selectionStates>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/deploymentTargetSelector.xml b/.idea/deploymentTargetSelector.xml
+--- a/.idea/deploymentTargetSelector.xml	(revision 90c99ecbc194cf806eab38b70cd4a2d5cfed96fc)
++++ b/.idea/deploymentTargetSelector.xml	(date 1794776280749)
+@@ -4,10 +4,10 @@
+     <selectionStates>
+       <SelectionState runConfigName="app">
+         <option name="selectionMode" value="DROPDOWN" />
+-        <DropdownSelection timestamp="2026-11-14T23:19:13.984612400Z">
++        <DropdownSelection timestamp="2026-11-15T20:57:22.502177100Z">
+           <Target type="DEFAULT_BOOT">
+             <handle>
+-              <DeviceId pluginId="PhysicalDevice" identifier="serial=MFLZAQPBDIO7MJMF" />
++              <DeviceId pluginId="PhysicalDevice" identifier="serial=7D5T5P9XAU8X9D6T" />
+             </handle>
+           </Target>
+         </DropdownSelection>

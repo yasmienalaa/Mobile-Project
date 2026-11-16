@@ -1,6 +1,6 @@
 package com.example.e_learning.auth
 
-import com.example.myapplication.entities.UserEntity
+import com.example.e_learning.entities.UserEntity
 import org.json.JSONArray
 
 object Role {

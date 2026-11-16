@@ -1,7 +1,7 @@
-package com.example.myapplication.dao
+package com.example.e_learning.dao
 
 import androidx.room.*
-import com.example.myapplication.entities.*
+import com.example.e_learning.entities.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao interface QuizDao {
