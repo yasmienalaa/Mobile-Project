@@ -31,7 +31,8 @@ object CourseCards {
         parent: ViewGroup,
         course: CourseEntity,
         onEdit: () -> Unit,
-        onDelete: () -> Unit
+        onDelete: () -> Unit,
+        onQuizzes: () -> Unit
     ): View {
         val card = LayoutInflater.from(context).inflate(R.layout.item_course_admin, parent, false)
         card.findViewById<TextView>(R.id.courseTitle).text = course.title
@@ -39,6 +40,7 @@ object CourseCards {
         card.findViewById<TextView>(R.id.courseDescription).text = course.description
         card.findViewById<TextView>(R.id.editCourseButton).setOnClickListener { onEdit() }
         card.findViewById<TextView>(R.id.deleteCourseButton).setOnClickListener { onDelete() }
+        card.findViewById<TextView>(R.id.manageQuizzesButton).setOnClickListener { onQuizzes() }
         return card
     }
 

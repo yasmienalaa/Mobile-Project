@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="22dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="22dp"
+    android:paddingBottom="8dp">
+    <EditText android:id="@+id/quizTitleInput" style="@style/CourseFormField" android:hint="Quiz title" android:inputType="textCapSentences" />
+    <EditText
+        android:id="@+id/quizDescriptionInput"
+        android:layout_width="match_parent"
+        android:layout_height="94dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_soft_input"
+        android:gravity="top"
+        android:hint="Description (optional)"
+        android:inputType="textCapSentences|textMultiLine"
+        android:padding="12dp"
+        android:textSize="15sp" />
+</LinearLayout>

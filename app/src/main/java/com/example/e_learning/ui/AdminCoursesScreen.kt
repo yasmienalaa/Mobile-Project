@@ -12,7 +12,8 @@ class AdminCoursesScreen(
     private val context: Context,
     private val onAddCourse: () -> Unit,
     private val onEditCourse: (CourseEntity) -> Unit,
-    private val onDeleteCourse: (CourseEntity) -> Unit
+    private val onDeleteCourse: (CourseEntity) -> Unit,
+    private val onManageQuizzes: (CourseEntity) -> Unit
 ) {
     private val root = LayoutInflater.from(context).inflate(R.layout.screen_admin_courses, null, false)
     private val courseList = root.findViewById<LinearLayout>(R.id.courseList)
@@ -35,7 +36,9 @@ class AdminCoursesScreen(
         courses.forEach { course ->
             courseList.addView(CourseCards.admin(context, courseList, course,
                 onEdit = { onEditCourse(course) },
-                onDelete = { onDeleteCourse(course) }))
+                onDelete = { onDeleteCourse(course) },
+                onQuizzes = { onManageQuizzes(course) }
+                ))
         }
     }
 }
