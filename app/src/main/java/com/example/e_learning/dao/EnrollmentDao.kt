@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
     @Query("SELECT * FROM enrollments WHERE userId = :userId") fun observeByUser(userId: Long): Flow<List<EnrollmentEntity>>
     @Query("SELECT EXISTS(SELECT 1 FROM enrollments WHERE userId = :userId AND courseId = :courseId)") suspend fun isEnrolled(userId: Long, courseId: Long): Boolean
     @Query("SELECT COUNT(*) FROM enrollments WHERE courseId = :courseId") fun observeStudentCountForCourse(courseId: Long): Flow<Int>
+    @Query("SELECT COUNT(*) FROM enrollments WHERE userId = :userId") suspend fun getEnrollmentCountForUser(userId: Long): Int
 }
 
 

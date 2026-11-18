@@ -6,20 +6,36 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.example.e_learning.R
+import com.example.e_learning.data.AdminStats
 import com.example.e_learning.entities.CourseEntity
 
 class AdminCoursesScreen(
     private val context: Context,
     private val onAddCourse: () -> Unit,
     private val onEditCourse: (CourseEntity) -> Unit,
-    private val onDeleteCourse: (CourseEntity) -> Unit
+    private val onDeleteCourse: (CourseEntity) -> Unit,
+    private val onViewStudents: (() -> Unit)? = null,
+    private val onManageLessons: (() -> Unit)? = null,
+    private val onManageQuizzes: (() -> Unit)? = null
 ) {
     private val root = LayoutInflater.from(context).inflate(R.layout.screen_admin_courses, null, false)
     private val courseList = root.findViewById<LinearLayout>(R.id.courseList)
+    private val statCoursesCount = root.findViewById<TextView>(R.id.statCoursesCount)
+    private val statLessonsCount = root.findViewById<TextView>(R.id.statLessonsCount)
+    private val statStudentsCount = root.findViewById<TextView>(R.id.statStudentsCount)
 
     fun createView(): View {
         root.findViewById<TextView>(R.id.addCourseButton).setOnClickListener { onAddCourse() }
+        root.findViewById<TextView>(R.id.viewStudentsShortcut).setOnClickListener { onViewStudents?.invoke() }
+        root.findViewById<TextView>(R.id.manageLessonsShortcut).setOnClickListener { onManageLessons?.invoke() }
+        root.findViewById<TextView>(R.id.manageQuizzesShortcut).setOnClickListener { onManageQuizzes?.invoke() }
         return root
+    }
+
+    fun renderStats(stats: AdminStats) {
+        statCoursesCount.text = stats.totalCourses.toString()
+        statLessonsCount.text = stats.totalLessons.toString()
+        statStudentsCount.text = stats.totalStudents.toString()
     }
 
     fun render(courses: List<CourseEntity>) {
@@ -39,3 +55,4 @@ class AdminCoursesScreen(
         }
     }
 }
+

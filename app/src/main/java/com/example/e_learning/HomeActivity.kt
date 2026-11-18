@@ -15,6 +15,7 @@ import com.example.e_learning.entities.CourseEntity
 import com.example.e_learning.database.AppDatabase
 import com.example.e_learning.entities.UserEntity
 import com.example.e_learning.ui.AdminCoursesScreen
+import com.example.e_learning.ui.AdminStudentsScreen
 import com.example.e_learning.ui.CourseDialogs
 import com.example.e_learning.ui.StudentCoursesScreen
 
@@ -23,10 +24,13 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var dialogs: CourseDialogs
     private lateinit var database: AppDatabase
     private var isAdmin = false
+    private var isViewingStudents = false
     private var selectedTab = HOME_TAB
     private var currentStudent: UserEntity? = null
+    private var currentAdmin: UserEntity? = null
     private var studentScreen: StudentCoursesScreen? = null
     private var adminScreen: AdminCoursesScreen? = null
+    private var adminStudentsScreen: AdminStudentsScreen? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,23 +69,67 @@ class HomeActivity : AppCompatActivity() {
         val screenContainer = findViewById<FrameLayout>(R.id.screenContainer)
         roleToggle.text = if (isAdmin) "Admin mode" else "Student mode"
         roleToggle.setOnClickListener {
-            isAdmin = !isAdmin
-            selectedTab = HOME_TAB
-            showCourses()
-            refreshCourses()
+            if (!isAdmin) {
+                repository.loadCurrentAdmin { result ->
+                    result.onSuccess { admin ->
+                        if (admin.role.equals("ADMIN", ignoreCase = true)) {
+                            currentAdmin = admin
+                            isAdmin = true
+                            isViewingStudents = false
+                            selectedTab = HOME_TAB
+                            showCourses()
+                            refreshCourses()
+                        } else {
+                            Toast.makeText(this, "Access Denied: ADMIN role required.", Toast.LENGTH_SHORT).show()
+                        }
+                    }.onFailure {
+                        Toast.makeText(this, "Access Denied: Couldn't verify ADMIN role.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } else {
+                isAdmin = false
+                isViewingStudents = false
+                selectedTab = HOME_TAB
+                showCourses()
+                refreshCourses()
+            }
         }
         bindNavigation()
         findViewById<LinearLayout>(R.id.bottomNavigation).visibility = if (isAdmin) View.GONE else View.VISIBLE
 
         if (isAdmin) {
-            adminScreen = AdminCoursesScreen(
-                context = this,
-                onAddCourse = { dialogs.edit() },
-                onEditCourse = { course -> dialogs.edit(course) },
-                onDeleteCourse = dialogs::confirmDelete
-            )
-            studentScreen = null
-            screenContainer.addView(adminScreen!!.createView())
+            if (isViewingStudents) {
+                adminStudentsScreen = AdminStudentsScreen(
+                    context = this,
+                    onBack = {
+                        isViewingStudents = false
+                        showCourses()
+                        refreshCourses()
+                    }
+                )
+                adminScreen = null
+                studentScreen = null
+                screenContainer.addView(adminStudentsScreen!!.createView())
+            } else {
+                adminScreen = AdminCoursesScreen(
+                    context = this,
+                    onAddCourse = { performAdminAction { dialogs.edit() } },
+                    onEditCourse = { course -> performAdminAction { dialogs.edit(course) } },
+                    onDeleteCourse = { course -> performAdminAction { dialogs.confirmDelete(course) } },
+                    onViewStudents = {
+                        performAdminAction {
+                            isViewingStudents = true
+                            showCourses()
+                            refreshCourses()
+                        }
+                    },
+                    onManageLessons = null,
+                    onManageQuizzes = null
+                )
+                adminStudentsScreen = null
+                studentScreen = null
+                screenContainer.addView(adminScreen!!.createView())
+            }
         } else {
             when (selectedTab) {
                 HOME_TAB -> {
@@ -137,11 +185,37 @@ class HomeActivity : AppCompatActivity() {
             .putExtra(CourseDetailsActivity.EXTRA_COURSE_ID, course.courseId))
     }
 
+    private fun performAdminAction(action: () -> Unit) {
+        val admin = currentAdmin
+        if (admin == null) {
+            Toast.makeText(this, "Access Denied: ADMIN role required.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        repository.validateAdminRole(admin.userId) { result ->
+            result.onSuccess { isValid ->
+                if (isValid) action()
+                else Toast.makeText(this, "Access Denied: ADMIN role validation failed.", Toast.LENGTH_SHORT).show()
+            }.onFailure {
+                Toast.makeText(this, "Access Denied: Permission check error.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     private fun refreshCourses() {
         if (isAdmin) {
-            repository.loadCourses { result ->
-                result.onSuccess { courses -> adminScreen?.render(courses) }
-                    .onFailure { showLoadError() }
+            if (isViewingStudents) {
+                repository.loadStudentsSummary { result ->
+                    result.onSuccess { students -> adminStudentsScreen?.render(students) }
+                        .onFailure { showLoadError() }
+                }
+            } else {
+                repository.loadCourses { result ->
+                    result.onSuccess { courses -> adminScreen?.render(courses) }
+                        .onFailure { showLoadError() }
+                }
+                repository.loadAdminStats { result ->
+                    result.onSuccess { stats -> adminScreen?.renderStats(stats) }
+                }
             }
             return
         }
