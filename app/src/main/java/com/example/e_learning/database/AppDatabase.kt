@@ -11,8 +11,8 @@ import com.example.e_learning.entities.*
     entities = [UserEntity::class, CourseEntity::class, LessonEntity::class,
         EnrollmentEntity::class, LessonProgressEntity::class, QuizEntity::class,
         QuestionEntity::class, QuizResultEntity::class, QuizAnswerEntity::class],
-    version = 1,
-    exportSchema = false
+    version = 2,
+    exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
@@ -27,6 +27,7 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile private var INSTANCE: AppDatabase? = null
         fun getInstance(context: Context): AppDatabase = INSTANCE ?: synchronized(this) {
             INSTANCE ?: Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "elearning_db")
+                .addMigrations(MIGRATION_1_2)
                 .build().also { INSTANCE = it }
         }
     }

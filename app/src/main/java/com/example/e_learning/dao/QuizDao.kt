@@ -13,4 +13,11 @@ import kotlinx.coroutines.flow.Flow
     @Update suspend fun updateQuestion(question: QuestionEntity)
     @Delete suspend fun deleteQuestion(question: QuestionEntity)
     @Query("SELECT * FROM questions WHERE quizId = :quizId ORDER BY position") fun observeQuestions(quizId: Long): Flow<List<QuestionEntity>>
+
+    @Query("SELECT * FROM quizzes WHERE quizId = :quizId LIMIT 1") suspend fun getQuizById(quizId: Long): QuizEntity?
+    @Query("SELECT * FROM quizzes WHERE lessonId = :lessonId ORDER BY quizId") suspend fun getQuizzesByLesson(lessonId: Long): List<QuizEntity>
+    @Query("SELECT COUNT(*) FROM quizzes WHERE lessonId = :lessonId") suspend fun countQuizzesForLesson(lessonId: Long): Int
+    @Query("SELECT * FROM questions WHERE quizId = :quizId ORDER BY position") suspend fun getQuestions(quizId: Long): List<QuestionEntity>
+    @Query("SELECT COUNT(*) FROM questions WHERE quizId = :quizId") suspend fun countQuestions(quizId: Long): Int
+    @Query("SELECT COALESCE(MAX(position), 0) + 1 FROM questions WHERE quizId = :quizId") suspend fun nextQuestionPosition(quizId: Long): Int
 }

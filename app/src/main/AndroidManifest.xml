@@ -22,5 +22,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".HomeActivity" android:exported="false" />
+        <activity android:name=".admin.AdminLessonsActivity" android:exported="false" />
+        <activity android:name=".admin.AdminQuizzesActivity" android:exported="false" />
+        <activity android:name=".admin.AdminQuestionsActivity" android:exported="false" />
     </application>
 </manifest>

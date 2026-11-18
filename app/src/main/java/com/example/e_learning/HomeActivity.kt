@@ -18,6 +18,7 @@ import com.example.e_learning.entities.UserEntity
 import com.example.e_learning.ui.AdminCoursesScreen
 import com.example.e_learning.ui.CourseDialogs
 import com.example.e_learning.ui.StudentCoursesScreen
+import com.example.e_learning.admin.AdminLessonsActivity
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var repository: CourseRepository
@@ -80,7 +81,12 @@ class HomeActivity : AppCompatActivity() {
                 context = this,
                 onAddCourse = { dialogs.edit() },
                 onEditCourse = { course -> dialogs.edit(course) },
-                onDeleteCourse = dialogs::confirmDelete
+                onDeleteCourse = dialogs::confirmDelete,
+                onManageQuizzes = { course ->
+                    startActivity(Intent(this, AdminLessonsActivity::class.java)
+                        .putExtra(AdminLessonsActivity.EXTRA_COURSE_ID, course.courseId)
+                        .putExtra(AdminLessonsActivity.EXTRA_COURSE_TITLE, course.title))
+                }
             )
             studentScreen = null
             screenContainer.addView(adminScreen!!.createView())
