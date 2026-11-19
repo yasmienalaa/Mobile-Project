@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.LinearLayout
+
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +21,7 @@ import com.example.e_learning.quiz.QuizActivity
 class LessonDetailsActivity : AppCompatActivity() {
     private lateinit var repository: CourseRepository
     private lateinit var quizRepository: StudentQuizRepository
+
     private var studentId: Long = -1L
     private var lessons: List<LessonEntity> = emptyList()
     private var currentIndex = 0
@@ -33,6 +35,7 @@ class LessonDetailsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_lesson_details)
         repository = CourseRepository(applicationContext, AppDatabase.getInstance(this))
         quizRepository = StudentQuizRepository(AppDatabase.getInstance(this))
+
         findViewById<TextView>(R.id.lessonBackButton)
             .setOnClickListener {
                 finish()
@@ -137,6 +140,7 @@ class LessonDetailsActivity : AppCompatActivity() {
         val lesson = lessons[currentIndex]
         currentLesson = lesson
         loadQuizzes(lesson)
+
         findViewById<TextView>(R.id.lessonTitle).text = lesson.title
         findViewById<TextView>(R.id.lessonType).text =
             if (lesson.contentType.equals("VIDEO", true)) {
@@ -183,6 +187,7 @@ class LessonDetailsActivity : AppCompatActivity() {
                 Toast.makeText(this, "Couldn't load lesson progress.", Toast.LENGTH_LONG).show()
            }
         }
+
     }
 
     override fun onResume() {
@@ -227,6 +232,7 @@ class LessonDetailsActivity : AppCompatActivity() {
             }
             list.addView(row)
         }
+
     }
 
     companion object {
