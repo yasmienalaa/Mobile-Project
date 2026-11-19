@@ -71,5 +71,46 @@
             android:textColor="@color/sage_primary"
             android:textSize="14sp"
             android:visibility="gone" />
+        <CheckBox
+            android:id="@+id/lessonCompletedCheckbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:buttonTint="#275346"
+            android:text="Mark this lesson as completed"
+            android:textColor="#275346"
+            android:textSize="15sp"
+            android:enabled="false" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/previousLessonButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Previous"
+                android:enabled="false" />
+
+            <Space
+                android:layout_width="12dp"
+                android:layout_height="1dp" />
+
+            <Button
+                android:id="@+id/nextLessonButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Next"
+                android:enabled="false" />
+
+        </LinearLayout>
+
+
     </LinearLayout>
 </ScrollView>
