@@ -67,6 +67,21 @@
                 android:textSize="14sp"
                 android:textStyle="bold" />
             <TextView
+                android:id="@+id/lessonCountLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Added Lessons (0)"
+                android:textColor="#275346"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+            <LinearLayout
+                android:id="@+id/lessonDraftList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp"/>
+            <TextView
                 android:id="@+id/noLessonsLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
