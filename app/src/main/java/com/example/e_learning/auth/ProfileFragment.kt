@@ -8,7 +8,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.e_learning.R
 import com.example.e_learning.databinding.FragmentProfileBinding
-import com.example.myapplication.entities.UserEntity
+import com.example.e_learning.entities.UserEntity
 import com.google.android.material.chip.Chip
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {

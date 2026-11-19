@@ -1,7 +1,7 @@
-package com.example.myapplication.dao
+package com.example.e_learning.dao
 
 import androidx.room.*
-import com.example.myapplication.entities.*
+import com.example.e_learning.entities.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -38,4 +38,15 @@ abstract class QuizResultDao {
 
     @Query("SELECT * FROM quiz_answers WHERE resultId = :resultId ORDER BY position")
     abstract suspend fun getAnswersForAttempt(resultId: Long): List<QuizAnswerEntity>
+
+
+    @Query("""
+    SELECT * FROM quiz_results
+    WHERE userId = :userId AND quizId = :quizId
+    ORDER BY submittedAt DESC""")
+    abstract suspend fun getUserResultsForQuiz(
+        userId: Long,
+        quizId: Long
+    ): List<QuizResultEntity>
+
 }

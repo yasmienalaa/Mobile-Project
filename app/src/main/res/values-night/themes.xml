@@ -1,19 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.Elearning" parent="Theme.Material3.Light.NoActionBar">
-        <item name="colorPrimary">@color/sage_text</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <item name="colorPrimaryContainer">@color/sage_secondary</item>
-        <item name="colorOnPrimaryContainer">@color/sage_text</item>
-        <item name="colorSecondary">@color/sage_primary</item>
-        <item name="colorOnSecondary">@color/sage_text</item>
-        <item name="colorSecondaryContainer">@color/sage_secondary</item>
-        <item name="colorOnSecondaryContainer">@color/sage_text</item>
-        <item name="colorTertiary">@color/sage_accent</item>
-        <item name="colorOnTertiary">@color/sage_text</item>
-        <item name="android:colorBackground">@color/sage_background</item>
-        <item name="colorSurface">@color/sage_background</item>
-        <item name="colorOnSurface">@color/sage_text</item>
-        <item name="colorOnBackground">@color/sage_text</item>
+    <style name="Base.Theme.Elearning" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your dark theme here. -->
+        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
     </style>
 </resources>

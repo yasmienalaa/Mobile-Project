@@ -1,4 +1,4 @@
-package com.example.myapplication.entities
+package com.example.e_learning.entities
 
 import androidx.room.*
 

@@ -6,8 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.database.AppDatabase
-import com.example.myapplication.entities.UserEntity
+import com.example.e_learning.database.AppDatabase
+import com.example.e_learning.entities.UserEntity
 import kotlinx.coroutines.launch
 
 class AuthViewModel(app: Application) : AndroidViewModel(app) {

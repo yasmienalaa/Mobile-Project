@@ -1,8 +1,8 @@
 package com.example.e_learning.auth
 
 import android.database.sqlite.SQLiteConstraintException
-import com.example.myapplication.dao.UserDao
-import com.example.myapplication.entities.UserEntity
+import com.example.e_learning.dao.UserDao
+import com.example.e_learning.entities.UserEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

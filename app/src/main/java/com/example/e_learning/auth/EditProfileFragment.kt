@@ -7,7 +7,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.e_learning.R
 import com.example.e_learning.databinding.FragmentEditProfileBinding
-import com.example.myapplication.entities.UserEntity
+import com.example.e_learning.entities.UserEntity
 
 class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 

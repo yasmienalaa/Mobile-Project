@@ -1,7 +1,7 @@
 package com.example.e_learning.auth
 
 import android.content.Context
-import com.example.myapplication.entities.UserEntity
+import com.example.e_learning.entities.UserEntity
 
 class SessionManager(context: Context) {
     private val prefs = context.applicationContext

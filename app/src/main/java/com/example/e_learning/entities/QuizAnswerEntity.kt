@@ -1,12 +1,11 @@
-package com.example.myapplication.entities
+package com.example.e_learning.entities
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-/** Snapshot of an answer at submission time, so later edits to a question do not
- * rewrite what the student originally saw. Never store a cleartext password here. */
+
 @Entity(
     tableName = "quiz_answers",
     foreignKeys = [
@@ -28,8 +27,8 @@ data class QuizAnswerEntity(
     val optionB: String,
     val optionC: String,
     val optionD: String,
-    val selectedOption: String?, // A, B, C, D, or null for unanswered
-    val correctOption: String,  // A, B, C, D
+    val selectedOption: String?,
+    val correctOption: String,
     val pointsAwarded: Int,
     val maxPoints: Int,
     val position: Int
