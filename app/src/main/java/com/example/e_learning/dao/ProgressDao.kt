@@ -15,4 +15,16 @@ import kotlinx.coroutines.flow.Flow
     fun observeByUser(userId: Long): Flow<List<LessonProgressEntity>>
     @Query("SELECT COUNT(*) FROM lesson_progress WHERE userId = :userId AND completed = 1 AND lessonId IN (SELECT lessonId FROM lessons WHERE courseId = :courseId)")
     fun observeCompletedCount(userId: Long, courseId: Long): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM lesson_progress WHERE userId = :userId AND completed = 1 AND lessonId IN (SELECT lessonId FROM lessons WHERE courseId = :courseId)")
+    suspend fun getCompletedCountForCourse(userId: Long, courseId: Long): Int
+
+    @Query("SELECT COUNT(*) FROM lesson_progress WHERE userId = :userId AND completed = 1")
+    suspend fun getCompletedCountForUser(userId: Long): Int
+
+    @Query("SELECT lessonId FROM lesson_progress WHERE userId = :userId AND completed = 1 AND lessonId IN (SELECT lessonId FROM lessons WHERE courseId = :courseId)")
+    suspend fun getCompletedLessonIdsForCourse(userId: Long, courseId: Long): List<Long>
+
+    @Query("SELECT * FROM lesson_progress WHERE userId = :userId AND lessonId IN (SELECT lessonId FROM lessons WHERE courseId = :courseId) ORDER BY lastOpenedAt DESC LIMIT 1")
+    suspend fun getLastOpenedProgressForCourse(userId: Long, courseId: Long): LessonProgressEntity?
 }

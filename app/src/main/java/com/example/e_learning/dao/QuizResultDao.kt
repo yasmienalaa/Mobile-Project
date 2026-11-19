@@ -49,4 +49,6 @@ abstract class QuizResultDao {
         quizId: Long
     ): List<QuizResultEntity>
 
+    @Query("SELECT * FROM quiz_results WHERE userId = :userId ORDER BY submittedAt DESC")
+    abstract suspend fun getUserResults(userId: Long): List<QuizResultEntity>
 }

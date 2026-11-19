@@ -9,7 +9,14 @@ import com.example.e_learning.R
 import com.example.e_learning.entities.CourseEntity
 
 object CourseCards {
-    fun student(context: Context, parent: ViewGroup, course: CourseEntity, enrolled: Boolean, onClick: () -> Unit): View {
+    fun student(
+        context: Context,
+        parent: ViewGroup,
+        course: CourseEntity,
+        enrolled: Boolean,
+        progressPercentage: Int? = null,
+        onClick: () -> Unit
+    ): View {
         val card = LayoutInflater.from(context).inflate(R.layout.item_course_student, parent, false)
         card.findViewById<TextView>(R.id.courseIcon).text = when (course.language.lowercase()) {
             "kotlin" -> "K"
@@ -20,7 +27,13 @@ object CourseCards {
         card.findViewById<TextView>(R.id.courseTitle).text = course.title
         card.findViewById<TextView>(R.id.courseMeta).text = "${course.language}  ·  ${course.level.prettyLevel()}"
         card.findViewById<TextView>(R.id.courseDescription).text = course.description
-        card.findViewById<TextView>(R.id.enrollmentStatus).visibility = if (enrolled) View.VISIBLE else View.GONE
+        val status = card.findViewById<TextView>(R.id.enrollmentStatus)
+        if (enrolled) {
+            status.text = if (progressPercentage != null) "✓ Enrolled  ·  $progressPercentage%" else "✓ Enrolled"
+            status.visibility = View.VISIBLE
+        } else {
+            status.visibility = View.GONE
+        }
         card.contentDescription = "${course.title}, ${course.language}, ${if (enrolled) "enrolled" else "not enrolled"}"
         card.setOnClickListener { onClick() }
         return card
@@ -30,13 +43,15 @@ object CourseCards {
         context: Context,
         parent: ViewGroup,
         course: CourseEntity,
+        lessonCount: Int = 0,
         onEdit: () -> Unit,
         onDelete: () -> Unit,
         onQuizzes: () -> Unit
     ): View {
         val card = LayoutInflater.from(context).inflate(R.layout.item_course_admin, parent, false)
         card.findViewById<TextView>(R.id.courseTitle).text = course.title
-        card.findViewById<TextView>(R.id.courseMeta).text = "${course.language}  ·  ${course.level.prettyLevel()}"
+        val lessonsText = "$lessonCount ${if (lessonCount == 1) "Lesson" else "Lessons"}"
+        card.findViewById<TextView>(R.id.courseMeta).text = "${course.language}  ·  ${course.level.prettyLevel()}  ·  $lessonsText"
         card.findViewById<TextView>(R.id.courseDescription).text = course.description
         card.findViewById<TextView>(R.id.editCourseButton).setOnClickListener { onEdit() }
         card.findViewById<TextView>(R.id.deleteCourseButton).setOnClickListener { onDelete() }

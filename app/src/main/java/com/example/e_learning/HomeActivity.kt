@@ -13,6 +13,7 @@ import com.example.e_learning.admin.AdminLessonsActivity
 import com.example.e_learning.auth.Role
 import com.example.e_learning.auth.SessionManager
 import com.example.e_learning.data.CourseRepository
+import com.example.e_learning.data.ProgressRepository
 import com.example.e_learning.database.AppDatabase
 import com.example.e_learning.entities.CourseEntity
 import com.example.e_learning.entities.UserEntity
@@ -20,9 +21,11 @@ import com.example.e_learning.ui.AdminCoursesScreen
 import com.example.e_learning.ui.AdminStudentsScreen
 import com.example.e_learning.ui.CourseDialogs
 import com.example.e_learning.ui.StudentCoursesScreen
+import com.example.e_learning.ui.StudentDashboardScreen
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var repository: CourseRepository
+    private lateinit var progressRepository: ProgressRepository
     private lateinit var dialogs: CourseDialogs
     private lateinit var database: AppDatabase
     private var isAdmin = false
@@ -30,6 +33,7 @@ class HomeActivity : AppCompatActivity() {
     private var selectedTab = HOME_TAB
     private var currentStudent: UserEntity? = null
     private var studentScreen: StudentCoursesScreen? = null
+    private var dashboardScreen: StudentDashboardScreen? = null
     private var adminScreen: AdminCoursesScreen? = null
     private var adminStudentsScreen: AdminStudentsScreen? = null
 
@@ -55,8 +59,10 @@ class HomeActivity : AppCompatActivity() {
             View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
         database = AppDatabase.getInstance(this)
         repository = CourseRepository(applicationContext, database)
+        progressRepository = ProgressRepository(database)
+
         if (!isAdmin) {
-            repository.setActiveUserId(sessionUserId)
+        repository.setActiveUserId(sessionUserId)
         }
         dialogs = CourseDialogs(this, repository, ::refreshCourses)
         showCourses()
@@ -83,32 +89,7 @@ class HomeActivity : AppCompatActivity() {
         val roleToggle = findViewById<TextView>(R.id.roleToggle)
         val screenContainer = findViewById<FrameLayout>(R.id.screenContainer)
         roleToggle.text = if (isAdmin) "Admin mode" else "Student mode"
-//        roleToggle.setOnClickListener {
-//            if (!isAdmin) {
-//                repository.loadCurrentAdmin { result ->
-//                    result.onSuccess { admin ->
-//                        if (admin.role.equals("ADMIN", ignoreCase = true)) {
-//                            currentAdmin = admin
-//                            isAdmin = true
-//                            isViewingStudents = false
-//                            selectedTab = HOME_TAB
-//                            showCourses()
-//                            refreshCourses()
-//                        } else {
-//                            Toast.makeText(this, "Access Denied: ADMIN role required.", Toast.LENGTH_SHORT).show()
-//                        }
-//                    }.onFailure {
-//                        Toast.makeText(this, "Access Denied: Couldn't verify ADMIN role.", Toast.LENGTH_SHORT).show()
-//                    }
-//                }
-//            } else {
-//                isAdmin = false
-//                isViewingStudents = false
-//                selectedTab = HOME_TAB
-//                showCourses()
-//                refreshCourses()
-//            }
-//        }
+
         bindNavigation()
         findViewById<LinearLayout>(R.id.bottomNavigation).visibility = View.VISIBLE
         findViewById<TextView>(R.id.navHome).visibility = if (isAdmin) View.GONE else View.VISIBLE
@@ -140,7 +121,9 @@ class HomeActivity : AppCompatActivity() {
                             refreshCourses()
                         }
                     },
-                    onManageLessons = null,
+                    onManageLessons = {
+                        Toast.makeText(this, "Select a course below to manage its lessons & quizzes", Toast.LENGTH_SHORT).show()
+                    },
                     onManageQuizzes = { course ->
                         startActivity(Intent(this, AdminLessonsActivity::class.java)
                             .putExtra(AdminLessonsActivity.EXTRA_COURSE_ID, course.courseId)
@@ -158,19 +141,21 @@ class HomeActivity : AppCompatActivity() {
                         openCourseOrEnroll(course, enrolled)
                     }
                     adminScreen = null
+                    dashboardScreen = null
                     screenContainer.addView(studentScreen!!.createView())
                 }
                 ENROLLED_TAB -> {
-                    studentScreen = StudentCoursesScreen(this, R.layout.screen_enrolled_courses) { course, enrolled ->
+                    studentScreen = StudentCoursesScreen(
+                        this,
+                        R.layout.screen_enrolled_courses
+                    ) { course, enrolled ->
                         openCourseOrEnroll(course, enrolled)
                     }
+
                     adminScreen = null
+                    dashboardScreen = null
                     screenContainer.addView(studentScreen!!.createView())
                 }
-//                PROFILE_TAB -> {
-//                    studentScreen = null
-//                    adminScreen = null
-//                }
             }
         }
         updateNavigationSelection()
@@ -220,8 +205,8 @@ class HomeActivity : AppCompatActivity() {
                         .onFailure { showLoadError() }
                 }
             } else {
-                repository.loadCourses { result ->
-                    result.onSuccess { courses -> adminScreen?.render(courses) }
+                repository.loadCoursesWithLessonCount { result ->
+                    result.onSuccess { coursesWithCount -> adminScreen?.render(coursesWithCount) }
                         .onFailure { showLoadError() }
                 }
                 repository.loadAdminStats { result ->
@@ -231,15 +216,19 @@ class HomeActivity : AppCompatActivity() {
             return
         }
         val studentId = currentStudent?.userId ?: return
+        if (selectedTab == ENROLLED_TAB || selectedTab == PROFILE_TAB) {
+            progressRepository.loadStudentSummary(studentId) { result ->
+                result.onSuccess { summary -> dashboardScreen?.render(summary) }
+                    .onFailure { showLoadError() }
+            }
+            return
+        }
         repository.loadCourses { allResult ->
             allResult.onSuccess { allCourses ->
                 repository.loadEnrolledCourses(studentId) { enrolledResult ->
                     enrolledResult.onSuccess { enrolledCourses ->
                         val enrolledIds = enrolledCourses.map { it.courseId }.toSet()
-                        studentScreen?.render(
-                            if (selectedTab == ENROLLED_TAB) enrolledCourses else allCourses,
-                            enrolledIds
-                        )
+                        studentScreen?.render(allCourses, enrolledIds)
                     }.onFailure { showLoadError() }
                 }
             }.onFailure { showLoadError() }
