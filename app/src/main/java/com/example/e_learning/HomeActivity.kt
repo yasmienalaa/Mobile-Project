@@ -132,7 +132,9 @@ class HomeActivity : AppCompatActivity() {
                             refreshCourses()
                         }
                     },
-                    onManageLessons = null,
+                    onManageLessons = {
+                        Toast.makeText(this, "Select a course below to manage its lessons & quizzes", Toast.LENGTH_SHORT).show()
+                    },
                     onManageQuizzes = { course ->
                         startActivity(Intent(this, AdminLessonsActivity::class.java)
                             .putExtra(AdminLessonsActivity.EXTRA_COURSE_ID, course.courseId)
@@ -226,8 +228,8 @@ class HomeActivity : AppCompatActivity() {
                         .onFailure { showLoadError() }
                 }
             } else {
-                repository.loadCourses { result ->
-                    result.onSuccess { courses -> adminScreen?.render(courses) }
+                repository.loadCoursesWithLessonCount { result ->
+                    result.onSuccess { coursesWithCount -> adminScreen?.render(coursesWithCount) }
                         .onFailure { showLoadError() }
                 }
                 repository.loadAdminStats { result ->

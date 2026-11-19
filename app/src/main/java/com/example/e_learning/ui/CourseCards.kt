@@ -30,13 +30,15 @@ object CourseCards {
         context: Context,
         parent: ViewGroup,
         course: CourseEntity,
+        lessonCount: Int = 0,
         onEdit: () -> Unit,
         onDelete: () -> Unit,
         onQuizzes: () -> Unit
     ): View {
         val card = LayoutInflater.from(context).inflate(R.layout.item_course_admin, parent, false)
         card.findViewById<TextView>(R.id.courseTitle).text = course.title
-        card.findViewById<TextView>(R.id.courseMeta).text = "${course.language}  ·  ${course.level.prettyLevel()}"
+        val lessonsText = "$lessonCount ${if (lessonCount == 1) "Lesson" else "Lessons"}"
+        card.findViewById<TextView>(R.id.courseMeta).text = "${course.language}  ·  ${course.level.prettyLevel()}  ·  $lessonsText"
         card.findViewById<TextView>(R.id.courseDescription).text = course.description
         card.findViewById<TextView>(R.id.editCourseButton).setOnClickListener { onEdit() }
         card.findViewById<TextView>(R.id.deleteCourseButton).setOnClickListener { onDelete() }

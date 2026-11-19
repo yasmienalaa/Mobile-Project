@@ -27,6 +27,11 @@ data class StudentSummary(
     val enrolledCoursesCount: Int
 )
 
+data class CourseWithLessonCount(
+    val course: CourseEntity,
+    val lessonCount: Int
+)
+
 class CourseRepository(context: Context, private val database: AppDatabase) {
     private val appContext = context.applicationContext
     private val io = Executors.newSingleThreadExecutor()
@@ -80,6 +85,21 @@ class CourseRepository(context: Context, private val database: AppDatabase) {
     fun loadCourses(onComplete: (Result<List<CourseEntity>>) -> Unit) {
         io.execute {
             val result = runCatching { runBlocking { database.courseDao().observeAll().first() } }
+            main.post { onComplete(result) }
+        }
+    }
+
+    fun loadCoursesWithLessonCount(onComplete: (Result<List<CourseWithLessonCount>>) -> Unit) {
+        io.execute {
+            val result = runCatching {
+                runBlocking {
+                    val courses = database.courseDao().observeAll().first()
+                    courses.map { course ->
+                        val count = database.lessonDao().observeByCourse(course.courseId).first().size
+                        CourseWithLessonCount(course, count)
+                    }
+                }
+            }
             main.post { onComplete(result) }
         }
     }

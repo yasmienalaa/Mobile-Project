@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.example.e_learning.R
 import com.example.e_learning.data.AdminStats
+import com.example.e_learning.data.CourseWithLessonCount
 import com.example.e_learning.entities.CourseEntity
 
 class AdminCoursesScreen(
@@ -28,6 +29,7 @@ class AdminCoursesScreen(
         root.findViewById<TextView>(R.id.addCourseButton).setOnClickListener { onAddCourse() }
         root.findViewById<TextView>(R.id.viewStudentsShortcut)?.setOnClickListener { onViewStudents?.invoke() }
         root.findViewById<TextView>(R.id.manageLessonsShortcut)?.setOnClickListener { onManageLessons?.invoke() }
+        root.findViewById<TextView>(R.id.manageQuizzesShortcut)?.setOnClickListener { onManageLessons?.invoke() }
         return root
     }
 
@@ -37,9 +39,9 @@ class AdminCoursesScreen(
         statStudentsCount?.text = stats.totalStudents.toString()
     }
 
-    fun render(courses: List<CourseEntity>) {
+    fun render(coursesWithCount: List<CourseWithLessonCount>) {
         courseList.removeAllViews()
-        if (courses.isEmpty()) {
+        if (coursesWithCount.isEmpty()) {
             val empty = LayoutInflater.from(context)
                 .inflate(R.layout.view_course_empty, courseList, false)
             empty.findViewById<TextView>(R.id.emptyTitle).text = "A little room for new ideas"
@@ -47,11 +49,11 @@ class AdminCoursesScreen(
             courseList.addView(empty)
             return
         }
-        courses.forEach { course ->
-            courseList.addView(CourseCards.admin(context, courseList, course,
-                onEdit = { onEditCourse(course) },
-                onDelete = { onDeleteCourse(course) },
-                onQuizzes = { onManageQuizzes?.invoke(course) }
+        coursesWithCount.forEach { item ->
+            courseList.addView(CourseCards.admin(context, courseList, item.course, lessonCount = item.lessonCount,
+                onEdit = { onEditCourse(item.course) },
+                onDelete = { onDeleteCourse(item.course) },
+                onQuizzes = { onManageQuizzes?.invoke(item.course) }
             ))
         }
     }
