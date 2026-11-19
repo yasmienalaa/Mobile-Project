@@ -1,18 +1,27 @@
 package com.example.e_learning
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
+import android.widget.LinearLayout
+
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.e_learning.data.CourseRepository
+import com.example.e_learning.data.LessonQuizItem
+import com.example.e_learning.data.StudentQuizRepository
 import com.example.e_learning.database.AppDatabase
 import com.example.e_learning.entities.LessonEntity
+import com.example.e_learning.quiz.QuizActivity
 
 class LessonDetailsActivity : AppCompatActivity() {
     private lateinit var repository: CourseRepository
+    private lateinit var quizRepository: StudentQuizRepository
+
     private var studentId: Long = -1L
     private var lessons: List<LessonEntity> = emptyList()
     private var currentIndex = 0
@@ -25,6 +34,8 @@ class LessonDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_lesson_details)
         repository = CourseRepository(applicationContext, AppDatabase.getInstance(this))
+        quizRepository = StudentQuizRepository(AppDatabase.getInstance(this))
+
         findViewById<TextView>(R.id.lessonBackButton)
             .setOnClickListener {
                 finish()
@@ -128,6 +139,8 @@ class LessonDetailsActivity : AppCompatActivity() {
         if (lessons.isEmpty()) return
         val lesson = lessons[currentIndex]
         currentLesson = lesson
+        loadQuizzes(lesson)
+
         findViewById<TextView>(R.id.lessonTitle).text = lesson.title
         findViewById<TextView>(R.id.lessonType).text =
             if (lesson.contentType.equals("VIDEO", true)) {
@@ -174,6 +187,52 @@ class LessonDetailsActivity : AppCompatActivity() {
                 Toast.makeText(this, "Couldn't load lesson progress.", Toast.LENGTH_LONG).show()
            }
         }
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Coming back from a quiz: refresh the "best score" of the lesson on screen.
+        currentLesson?.let { loadQuizzes(it) }
+    }
+
+    private fun loadQuizzes(lesson: LessonEntity) {
+        findViewById<LinearLayout>(R.id.lessonQuizList).removeAllViews()
+        findViewById<View>(R.id.noQuizMessage).visibility = View.GONE
+        quizRepository.loadLessonQuizzes(lesson.lessonId, studentId) { result ->
+            if (currentLesson?.lessonId != lesson.lessonId) return@loadLessonQuizzes // student already moved to another lesson
+            result.onSuccess { renderQuizzes(it) }
+                .onFailure { Toast.makeText(this, "Couldn't load quizzes.", Toast.LENGTH_SHORT).show() }
+        }
+    }
+
+    private fun renderQuizzes(items: List<LessonQuizItem>) {
+        val list = findViewById<LinearLayout>(R.id.lessonQuizList)
+        list.removeAllViews()
+        findViewById<View>(R.id.noQuizMessage).visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
+        items.forEach { item ->
+            val row = LayoutInflater.from(this).inflate(R.layout.item_lesson_quiz, list, false)
+            row.findViewById<TextView>(R.id.quizItemTitle).text = item.quiz.title
+            val n = item.questionCount
+            val meta = row.findViewById<TextView>(R.id.quizItemMeta)
+            if (n == 0) {
+                meta.text = "Not ready yet. No questions added"
+                row.isClickable = false
+                row.isFocusable = false
+                row.alpha = 0.76f
+                row.findViewById<View>(R.id.quizItemChevron).visibility = View.GONE
+            } else {
+                val best = item.best?.takeIf { it.maxScore > 0 }
+                meta.text = "$n ${if (n == 1) "question" else "questions"}" +
+                    (best?.let { "  ·  Best: ${it.score}/${it.maxScore} (${it.score * 100 / it.maxScore}%)" } ?: "")
+                row.setOnClickListener {
+                    startActivity(Intent(this, QuizActivity::class.java)
+                        .putExtra(QuizActivity.EXTRA_QUIZ_ID, item.quiz.quizId))
+                }
+            }
+            list.addView(row)
+        }
+
     }
 
     companion object {

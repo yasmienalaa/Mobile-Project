@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F7F5"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Header -->
+
+        <TextView
+            android:id="@+id/createQuizBackButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="← Back"
+            android:textColor="#356B52"
+            android:textSize="16sp"
+            android:padding="8dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create New Quiz"
+            android:textColor="#244D3B"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create your quiz and add all questions in one place."
+            android:textColor="#777777"
+            android:textSize="14sp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Quiz Information -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Quiz Information"
+            android:textColor="#244D3B"
+            android:textSize="19sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
+            android:id="@+id/quizTitleInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Quiz Title"
+            android:inputType="textCapSentences"
+            android:padding="14dp"
+            android:backgroundTint="#356B52" />
+
+        <EditText
+            android:id="@+id/quizDescriptionInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Quiz Description"
+            android:inputType="textCapSentences|textMultiLine"
+            android:minLines="2"
+            android:gravity="top"
+            android:padding="14dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="#356B52" />
+
+        <!-- Bulk Import -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Bulk Import Questions"
+            android:textColor="#244D3B"
+            android:textSize="19sp"
+            android:textStyle="bold"
+            android:layout_marginTop="28dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Paste multiple questions with their options and correct answers."
+            android:textColor="#777777"
+            android:textSize="13sp"
+            android:layout_marginTop="6dp" />
+
+        <EditText
+            android:id="@+id/bulkQuestionsInput"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:hint="Paste your questions here..."
+            android:gravity="top|start"
+            android:inputType="textMultiLine|textCapSentences"
+            android:padding="14dp"
+            android:backgroundTint="#356B52"
+            android:layout_marginTop="12dp" />
+
+        <Button
+            android:id="@+id/importQuestionsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Import Questions"
+            android:layout_marginTop="10dp" />
+
+        <!-- Manual Questions -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Questions"
+            android:textColor="#244D3B"
+            android:textSize="19sp"
+            android:textStyle="bold"
+            android:layout_marginTop="28dp" />
+
+        <TextView
+            android:id="@+id/questionCountText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="0 Questions Added"
+            android:textColor="#777777"
+            android:textSize="13sp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Dynamic Question Cards -->
+
+        <LinearLayout
+            android:id="@+id/questionsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <Button
+            android:id="@+id/addQuestionButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="+ Add Another Question"
+            android:layout_marginTop="12dp" />
+
+        <!-- Save Quiz -->
+
+        <Button
+            android:id="@+id/saveQuizButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save Complete Quiz"
+            android:layout_marginTop="28dp"
+            android:layout_marginBottom="30dp" />
+
+    </LinearLayout>
+
+</ScrollView>

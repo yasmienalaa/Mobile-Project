@@ -132,7 +132,6 @@ class CourseRepository(context: Context, private val database: AppDatabase) {
             main.post { onComplete(result) }
         }
     }
-
     fun insertLesson(lesson: LessonEntity, onComplete: (Result<LessonEntity>) -> Unit) {
         io.execute {
             val result = runCatching {
@@ -143,6 +142,7 @@ class CourseRepository(context: Context, private val database: AppDatabase) {
             main.post { onComplete(result) }
         }
     }
+
 
     fun updateLesson(lesson: LessonEntity, onComplete: (Result<Unit>) -> Unit) {
         io.execute {
@@ -307,6 +307,7 @@ class CourseRepository(context: Context, private val database: AppDatabase) {
         }
     }
 
+
     private suspend fun createDemoAdmin(): UserEntity {
         val id = database.userDao().insert(
             UserEntity(
@@ -318,6 +319,7 @@ class CourseRepository(context: Context, private val database: AppDatabase) {
         )
         return database.userDao().findById(id) ?: error("Couldn't create the local admin profile.")
     }
+
 
     companion object {
         const val SESSION_PREFERENCES = "student_session"

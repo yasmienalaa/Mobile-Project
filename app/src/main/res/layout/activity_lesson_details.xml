@@ -71,6 +71,32 @@
             android:textColor="@color/sage_primary"
             android:textSize="14sp"
             android:visibility="gone" />
+        <TextView
+            android:id="@+id/lessonQuizzesHeading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="26dp"
+            android:paddingBottom="10dp"
+            android:text="Quizzes"
+            android:textColor="#275346"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/noQuizMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_soft_card"
+            android:padding="18dp"
+            android:text="No quiz has been added to this lesson yet."
+            android:textColor="@color/sage_primary"
+            android:textSize="14sp"
+            android:visibility="gone" />
+        <LinearLayout
+            android:id="@+id/lessonQuizList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
         <CheckBox
             android:id="@+id/lessonCompletedCheckbox"
             android:layout_width="match_parent"

@@ -41,10 +41,23 @@ class AdminQuizzesActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.adminBackButton).setOnClickListener { finish() }
         findViewById<TextView>(R.id.adminListTitle).text = "Quizzes"
         findViewById<TextView>(R.id.adminListSubtitle).text = intent.getStringExtra(EXTRA_LESSON_TITLE).orEmpty()
+
         findViewById<TextView>(R.id.adminAddButton).apply {
             text = "＋   Add new quiz"
-            setOnClickListener { showQuizDialog(null) }
+
+            setOnClickListener {
+                val createQuizIntent = Intent(
+                    this@AdminQuizzesActivity,
+                    AdminCreateQuizActivity::class.java
+                )
+
+                createQuizIntent.putExtra(EXTRA_COURSE_ID, courseId)
+                createQuizIntent.putExtra(EXTRA_LESSON_ID, lessonId)
+
+                startActivity(createQuizIntent)
+            }
         }
+
         emptyMessage.text = "This lesson has no quiz yet. Every lesson needs at least one, so add it now."
     }
 
