@@ -32,7 +32,6 @@ class HomeActivity : AppCompatActivity() {
     private var isViewingStudents = false
     private var selectedTab = HOME_TAB
     private var currentStudent: UserEntity? = null
-    private var currentAdmin: UserEntity? = null
     private var studentScreen: StudentCoursesScreen? = null
     private var dashboardScreen: StudentDashboardScreen? = null
     private var adminScreen: AdminCoursesScreen? = null
@@ -40,26 +39,33 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val session = SessionManager(this)
         val sessionRole = session.role
         val sessionUserId = session.userId
 
-        if (sessionRole != null && sessionUserId != null) {
-            isAdmin = sessionRole == Role.ADMIN
-            if (!isAdmin) repository = CourseRepository(applicationContext, AppDatabase.getInstance(this)).also { it.setActiveUserId(sessionUserId) }
+        if (sessionRole == null || sessionUserId == null) {
+            startActivity(
+                Intent(this, MainActivity::class.java)
+            )
+            finish()
+            return
         }
 
+        isAdmin = sessionRole == Role.ADMIN
         window.statusBarColor = getColor(R.color.sage_background)
         window.navigationBarColor = getColor(R.color.sage_background)
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        window.decorView.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
         database = AppDatabase.getInstance(this)
+        repository = CourseRepository(applicationContext, database)
         progressRepository = ProgressRepository(database)
-        if (!::repository.isInitialized) {
-            repository = CourseRepository(applicationContext, database)
+
+        if (!isAdmin) {
+        repository.setActiveUserId(sessionUserId)
         }
         dialogs = CourseDialogs(this, repository, ::refreshCourses)
         showCourses()
-
         if (isAdmin) {
             refreshCourses()
         } else {
@@ -67,11 +73,12 @@ class HomeActivity : AppCompatActivity() {
                 studentResult.onSuccess { student ->
                     currentStudent = student
                     refreshCourses()
-                }.onFailure { showLoadError() }
+                }.onFailure {
+                    showLoadError()
+                }
             }
         }
     }
-
     override fun onResume() {
         super.onResume()
         if (::repository.isInitialized && (currentStudent != null || isAdmin)) refreshCourses()
@@ -82,35 +89,12 @@ class HomeActivity : AppCompatActivity() {
         val roleToggle = findViewById<TextView>(R.id.roleToggle)
         val screenContainer = findViewById<FrameLayout>(R.id.screenContainer)
         roleToggle.text = if (isAdmin) "Admin mode" else "Student mode"
-        roleToggle.setOnClickListener {
-            if (!isAdmin) {
-                repository.loadCurrentAdmin { result ->
-                    result.onSuccess { admin ->
-                        if (admin.role.equals("ADMIN", ignoreCase = true)) {
-                            currentAdmin = admin
-                            isAdmin = true
-                            isViewingStudents = false
-                            selectedTab = HOME_TAB
-                            showCourses()
-                            refreshCourses()
-                        } else {
-                            Toast.makeText(this, "Access Denied: ADMIN role required.", Toast.LENGTH_SHORT).show()
-                        }
-                    }.onFailure {
-                        Toast.makeText(this, "Access Denied: Couldn't verify ADMIN role.", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            } else {
-                isAdmin = false
-                isViewingStudents = false
-                selectedTab = HOME_TAB
-                showCourses()
-                refreshCourses()
-            }
-        }
-        bindNavigation()
-        findViewById<LinearLayout>(R.id.bottomNavigation).visibility = if (isAdmin) View.GONE else View.VISIBLE
 
+        bindNavigation()
+        findViewById<LinearLayout>(R.id.bottomNavigation).visibility = View.VISIBLE
+        findViewById<TextView>(R.id.navHome).visibility = if (isAdmin) View.GONE else View.VISIBLE
+        findViewById<TextView>(R.id.navEnrolled).visibility = if (isAdmin) View.GONE else View.VISIBLE
+        findViewById<TextView>(R.id.navProfile).visibility = View.VISIBLE
         if (isAdmin) {
             if (isViewingStudents) {
                 adminStudentsScreen = AdminStudentsScreen(
@@ -160,13 +144,17 @@ class HomeActivity : AppCompatActivity() {
                     dashboardScreen = null
                     screenContainer.addView(studentScreen!!.createView())
                 }
-                ENROLLED_TAB, PROFILE_TAB -> {
-                    studentScreen = null
-                    adminScreen = null
-                    dashboardScreen = StudentDashboardScreen(this) { course ->
-                        openCourseOrEnroll(course, true)
+                ENROLLED_TAB -> {
+                    studentScreen = StudentCoursesScreen(
+                        this,
+                        R.layout.screen_enrolled_courses
+                    ) { course, enrolled ->
+                        openCourseOrEnroll(course, enrolled)
                     }
-                    screenContainer.addView(dashboardScreen!!.createView())
+
+                    adminScreen = null
+                    dashboardScreen = null
+                    screenContainer.addView(studentScreen!!.createView())
                 }
             }
         }
@@ -176,9 +164,8 @@ class HomeActivity : AppCompatActivity() {
     private fun bindNavigation() {
         findViewById<TextView>(R.id.navHome).setOnClickListener { selectTab(HOME_TAB) }
         findViewById<TextView>(R.id.navEnrolled).setOnClickListener { selectTab(ENROLLED_TAB) }
-        findViewById<TextView>(R.id.navProfile).setOnClickListener { selectTab(PROFILE_TAB) }
+        findViewById<TextView>(R.id.navProfile).setOnClickListener { startActivity(Intent(this, MainActivity::class.java).putExtra(MainActivity.EXTRA_OPEN_PROFILE, true)) }
     }
-
     private fun selectTab(tab: String) {
         if (isAdmin || selectedTab == tab) return
         selectedTab = tab
@@ -189,9 +176,8 @@ class HomeActivity : AppCompatActivity() {
     private fun updateNavigationSelection() {
         setNavigationItem(R.id.navHome, selectedTab == HOME_TAB)
         setNavigationItem(R.id.navEnrolled, selectedTab == ENROLLED_TAB)
-        setNavigationItem(R.id.navProfile, selectedTab == PROFILE_TAB)
+        setNavigationItem(R.id.navProfile, false)
     }
-
     private fun setNavigationItem(viewId: Int, selected: Boolean) {
         val item = findViewById<TextView>(viewId)
         item.setTextColor(getColor(if (selected) R.color.sage_text else R.color.sage_primary))
@@ -204,25 +190,13 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun performAdminAction(action: () -> Unit) {
-        if (isAdmin) {
-            action()
-            return
-        }
-        val admin = currentAdmin
-        if (admin == null) {
+        if (!isAdmin) {
             Toast.makeText(this, "Access Denied: ADMIN role required.", Toast.LENGTH_SHORT).show()
             return
         }
-        repository.validateAdminRole(admin.userId) { result ->
-            result.onSuccess { isValid ->
-                if (isValid) action()
-                else Toast.makeText(this, "Access Denied: ADMIN role validation failed.", Toast.LENGTH_SHORT).show()
-            }.onFailure {
-                Toast.makeText(this, "Access Denied: Permission check error.", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
 
+        action()
+    }
     private fun refreshCourses() {
         if (isAdmin) {
             if (isViewingStudents) {
@@ -260,7 +234,6 @@ class HomeActivity : AppCompatActivity() {
             }.onFailure { showLoadError() }
         }
     }
-
     private fun showLoadError() {
         Toast.makeText(this, "Couldn't load the demo learning data.", Toast.LENGTH_LONG).show()
     }
@@ -268,6 +241,6 @@ class HomeActivity : AppCompatActivity() {
     companion object {
         private const val HOME_TAB = "home"
         private const val ENROLLED_TAB = "enrolled"
-        private const val PROFILE_TAB = "profile"
+
     }
 }

@@ -28,8 +28,8 @@ class AdminCoursesScreen(
     fun createView(): View {
         root.findViewById<TextView>(R.id.addCourseButton).setOnClickListener { onAddCourse() }
         root.findViewById<TextView>(R.id.viewStudentsShortcut)?.setOnClickListener { onViewStudents?.invoke() }
-        root.findViewById<TextView>(R.id.manageLessonsShortcut)?.setOnClickListener { onManageLessons?.invoke() }
-        root.findViewById<TextView>(R.id.manageQuizzesShortcut)?.setOnClickListener { onManageLessons?.invoke() }
+        root.findViewById<TextView>(R.id.manageLessonsShortcut)?.visibility = View.GONE
+        root.findViewById<TextView>(R.id.manageQuizzesShortcut)?.visibility = View.GONE
         return root
     }
 

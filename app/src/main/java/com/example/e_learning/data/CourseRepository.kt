@@ -18,7 +18,6 @@ data class AdminStats(
     val totalLessons: Int,
     val totalStudents: Int
 )
-
 data class StudentSummary(
     val userId: Long,
     val fullName: String,
@@ -26,12 +25,10 @@ data class StudentSummary(
     val level: String,
     val enrolledCoursesCount: Int
 )
-
 data class CourseWithLessonCount(
     val course: CourseEntity,
     val lessonCount: Int
 )
-
 class CourseRepository(context: Context, private val database: AppDatabase) {
     private val appContext = context.applicationContext
     private val io = Executors.newSingleThreadExecutor()
@@ -41,69 +38,53 @@ class CourseRepository(context: Context, private val database: AppDatabase) {
     fun setActiveUserId(userId: Long) {
         preferences.edit().putLong(ACTIVE_USER_ID, userId).apply()
     }
-
     fun loadCurrentStudent(onComplete: (Result<UserEntity>) -> Unit) {
         io.execute {
             val result = runCatching {
                 runBlocking {
                     val savedId = preferences.getLong(ACTIVE_USER_ID, INVALID_USER_ID)
-                    val savedStudent = if (savedId == INVALID_USER_ID) null else database.userDao().findById(savedId)
-                    savedStudent?.takeIf { it.role.equals("STUDENT", ignoreCase = true) }
-                        ?: database.userDao().findFirstStudent()
+                    require(savedId != INVALID_USER_ID) { "No signed-in student session found." }
+
+                    database.userDao().findById(savedId)?.takeIf {
+                            it.role.equals("STUDENT", ignoreCase = true) }
+                        ?: error("The signed-in account is not a student.")
                 }
             }
-            result.onSuccess { student ->
-                if (student != null) preferences.edit().putLong(ACTIVE_USER_ID, student.userId).apply()
+            main.post {
+                onComplete(result)
             }
-            main.post { onComplete(result.mapCatching { it ?: error("No student profile found.") }) }
         }
     }
-
-    fun loadCurrentAdmin(onComplete: (Result<UserEntity>) -> Unit) {
-        io.execute {
-            val result = runCatching {
-                runBlocking {
-                    database.userDao().findFirstAdmin() ?: createDemoAdmin()
-                }
-            }
-            main.post { onComplete(result) }
-        }
-    }
-
-    fun validateAdminRole(userId: Long, onComplete: (Result<Boolean>) -> Unit) {
-        io.execute {
-            val result = runCatching {
-                runBlocking {
-                    val user = database.userDao().findById(userId)
-                    user?.role?.equals("ADMIN", ignoreCase = true) == true
-                }
-            }
-            main.post { onComplete(result) }
-        }
-    }
-
     fun loadCourses(onComplete: (Result<List<CourseEntity>>) -> Unit) {
         io.execute {
             val result = runCatching { runBlocking { database.courseDao().observeAll().first() } }
             main.post { onComplete(result) }
         }
     }
-
-    fun loadCoursesWithLessonCount(onComplete: (Result<List<CourseWithLessonCount>>) -> Unit) {
+    fun loadCoursesWithLessonCount(
+        onComplete: (Result<List<CourseWithLessonCount>>) -> Unit
+    ) {
         io.execute {
             val result = runCatching {
                 runBlocking {
                     val courses = database.courseDao().observeAll().first()
+
                     courses.map { course ->
-                        val count = database.lessonDao().observeByCourse(course.courseId).first().size
+                        val count = database.lessonDao()
+                            .observeByCourse(course.courseId)
+                            .first()
+                            .size
+
                         CourseWithLessonCount(course, count)
                     }
                 }
             }
-            main.post { onComplete(result) }
+
+            main.post {
+                onComplete(result)
+            }
         }
     }
-
     fun loadAdminStats(onComplete: (Result<AdminStats>) -> Unit) {
         io.execute {
             val result = runCatching {
@@ -117,7 +98,6 @@ class CourseRepository(context: Context, private val database: AppDatabase) {
             main.post { onComplete(result) }
         }
     }
-
     fun loadStudentsSummary(onComplete: (Result<List<StudentSummary>>) -> Unit) {
         io.execute {
             val result = runCatching {
@@ -138,7 +118,6 @@ class CourseRepository(context: Context, private val database: AppDatabase) {
             main.post { onComplete(result) }
         }
     }
-
     fun loadEnrolledCourses(userId: Long, onComplete: (Result<List<CourseEntity>>) -> Unit) {
         io.execute {
             val result = runCatching { runBlocking { database.courseDao().observeEnrolledByUser(userId).first() } }
@@ -326,20 +305,6 @@ class CourseRepository(context: Context, private val database: AppDatabase) {
             main.post { onComplete(result) }
         }
     }
-
-
-    private suspend fun createDemoAdmin(): UserEntity {
-        val id = database.userDao().insert(
-            UserEntity(
-                fullName = "System Admin",
-                email = "admin@local.elearning",
-                passwordHash = "",
-                role = "ADMIN"
-            )
-        )
-        return database.userDao().findById(id) ?: error("Couldn't create the local admin profile.")
-    }
-
 
     companion object {
         const val SESSION_PREFERENCES = "student_session"
