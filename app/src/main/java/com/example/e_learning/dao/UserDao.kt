@@ -34,4 +34,10 @@ interface UserDao {
 
     @Query("SELECT COUNT(*) FROM users WHERE role = 'STUDENT'")
     fun observeStudentCount(): Flow<Int>
+
+    @Query("SELECT * FROM users WHERE upper(role) = 'STUDENT' ORDER BY fullName")
+    suspend fun getAllStudents(): List<UserEntity>
+
+    @Query("SELECT * FROM users WHERE upper(role) = 'ADMIN' ORDER BY userId LIMIT 1")
+    suspend fun findFirstAdmin(): UserEntity?
 }
