@@ -84,6 +84,54 @@ class QuizRepository(private val database: AppDatabase) {
         dao.deleteQuestion(question)
     }
 
+
+    fun saveQuizWithQuestions(
+        quiz: QuizEntity,
+        questions: List<QuestionEntity>,
+        onComplete: (Result<Unit>) -> Unit
+    ) = execute(onComplete) {
+
+        require(quiz.title.isNotBlank()) {
+            "Quiz title is required."
+        }
+
+        require(quiz.lessonId > 0 && quiz.courseId > 0) {
+            "A quiz must belong to a lesson."
+        }
+
+        require(questions.isNotEmpty()) {
+            "Add at least one question."
+        }
+
+        questions.forEach { question ->
+            validate(question)
+        }
+
+        database.withTransaction {
+
+            val savedQuizId = if (quiz.quizId == 0L) {
+                dao.insertQuiz(quiz)
+            } else {
+                dao.updateQuiz(quiz)
+                quiz.quizId
+            }
+
+            dao.deleteQuestionsForQuiz(savedQuizId)
+
+            val preparedQuestions = questions.mapIndexed { index, question ->
+                question.copy(
+                    questionId = 0L,
+                    quizId = savedQuizId,
+                    position = index + 1
+                )
+            }
+
+            dao.insertQuestions(preparedQuestions)
+        }
+
+        Unit
+    }
+
     private fun validate(q: QuestionEntity) {
         require(q.questionText.isNotBlank()) { "Question text is required." }
         require(listOf(q.optionA, q.optionB, q.optionC, q.optionD).all { it.isNotBlank() }) { "All four options are required." }

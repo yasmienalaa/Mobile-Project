@@ -1,5 +1,5 @@
 package com.example.e_learning.data
-
+import androidx.room.withTransaction
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
@@ -7,6 +7,7 @@ import com.example.e_learning.database.AppDatabase
 import com.example.e_learning.entities.CourseEntity
 import com.example.e_learning.entities.EnrollmentEntity
 import com.example.e_learning.entities.LessonEntity
+import com.example.e_learning.entities.LessonProgressEntity
 import com.example.e_learning.entities.UserEntity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -58,7 +59,37 @@ class CourseRepository(context: Context, private val database: AppDatabase) {
             main.post { onComplete(result) }
         }
     }
+    fun insertLesson(lesson: LessonEntity, onComplete: (Result<LessonEntity>) -> Unit) {
+        io.execute {
+            val result = runCatching {
+                val newId = runBlocking {
+                    database.lessonDao().insert(lesson) }
+                lesson.copy(lessonId = newId)
+            }
+            main.post { onComplete(result) }
+        }
+    }
 
+    fun updateLesson(lesson: LessonEntity, onComplete: (Result<Unit>) -> Unit) {
+        io.execute {
+            val result = runCatching {
+                runBlocking {
+                    database.lessonDao().update(lesson)
+                }
+            }
+            main.post { onComplete(result) }
+        }
+    }
+    fun deleteLesson(lesson: LessonEntity, onComplete: (Result<Unit>) -> Unit) {
+        io.execute {
+            val result = runCatching {
+                runBlocking {
+                    database.lessonDao().delete(lesson)
+                }
+            }
+            main.post { onComplete(result) }
+        }
+    }
     fun loadLessonsForCourse(courseId: Long, onComplete: (Result<List<LessonEntity>>) -> Unit) {
         io.execute {
             val result = runCatching { runBlocking { database.lessonDao().observeByCourse(courseId).first() } }
@@ -72,6 +103,32 @@ class CourseRepository(context: Context, private val database: AppDatabase) {
             main.post { onComplete(result) }
         }
     }
+
+    fun createCourseWithLessons(course: CourseEntity, lessons: List<LessonEntity>, onComplete: (Result<Unit>) -> Unit) {
+        io.execute {
+            val result = runCatching {
+                require(lessons.isNotEmpty()) {
+                    "A course must contain at least one lesson." }
+                require(course.courseId == 0L) {
+                    "This operation is only for creating new courses." }
+                runBlocking {
+                    database.withTransaction {
+                        val newCourseId = database.courseDao().insert(course)
+                        lessons.forEachIndexed { index, lesson ->
+                            val lessonToSave = lesson.copy(
+                                courseId = newCourseId,
+                                position = index + 1)
+                            database.lessonDao().insert(lessonToSave)
+                        }
+                    }
+                }
+            }.map { Unit }
+            main.post {
+                onComplete(result)
+            }
+        }
+    }
+
     fun saveCourse(course: CourseEntity, onComplete: (Result<Unit>) -> Unit) {
         io.execute {
             val result = runCatching {
@@ -125,6 +182,54 @@ class CourseRepository(context: Context, private val database: AppDatabase) {
         }
     }
 
+    fun recordLessonOpened(userId: Long, lessonId: Long, onComplete: (Result<LessonProgressEntity>) -> Unit) {
+        io.execute {
+            val result = runCatching {
+                runBlocking {
+                    val oldProgress = database.progressDao().getForLesson(userId, lessonId)
+                    val updatedProgress = oldProgress?.copy(lastOpenedAt = System.currentTimeMillis()) ?: LessonProgressEntity(
+                        userId = userId,
+                        lessonId = lessonId,
+                        completed = false,
+                        lastOpenedAt = System.currentTimeMillis()
+                    )
+                    database.progressDao().save(updatedProgress)
+                    updatedProgress
+                }
+            }
+
+            main.post { onComplete(result) }
+        }
+    }
+
+    fun setLessonCompleted(userId: Long, lessonId: Long, completed: Boolean, onComplete: (Result<Unit>) -> Unit) {
+        io.execute {
+            val result = runCatching {
+                runBlocking {
+                    val oldProgress = database.progressDao().getForLesson(userId, lessonId)
+                    val updatedProgress = if (oldProgress != null) {
+                        oldProgress.copy(
+                            completed = completed,
+                            completedAt = if (completed) {
+                                System.currentTimeMillis()
+                            } else { null }
+                        )
+                    } else {
+                        LessonProgressEntity(
+                            userId = userId,
+                            lessonId = lessonId,
+                            completed = completed,
+                            completedAt = if (completed) {
+                                System.currentTimeMillis()
+                            } else { null }
+                        )
+                    }
+                    database.progressDao().save(updatedProgress)
+                }
+            }
+            main.post { onComplete(result) }
+        }
+    }
     companion object {
         const val SESSION_PREFERENCES = "student_session"
         const val ACTIVE_USER_ID = "current_user_id"

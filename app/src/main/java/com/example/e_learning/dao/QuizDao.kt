@@ -10,6 +10,14 @@ import kotlinx.coroutines.flow.Flow
     @Delete suspend fun deleteQuiz(quiz: QuizEntity)
     @Query("SELECT * FROM quizzes WHERE courseId = :courseId") fun observeByCourse(courseId: Long): Flow<List<QuizEntity>>
     @Insert suspend fun insertQuestion(question: QuestionEntity): Long
+    @Insert
+    suspend fun insertQuestions(
+        questions: List<QuestionEntity>
+    ): List<Long>
+
+    @Query("DELETE FROM questions WHERE quizId = :quizId")
+    suspend fun deleteQuestionsForQuiz(quizId: Long)
+
     @Update suspend fun updateQuestion(question: QuestionEntity)
     @Delete suspend fun deleteQuestion(question: QuestionEntity)
     @Query("SELECT * FROM questions WHERE quizId = :quizId ORDER BY position") fun observeQuestions(quizId: Long): Flow<List<QuestionEntity>>

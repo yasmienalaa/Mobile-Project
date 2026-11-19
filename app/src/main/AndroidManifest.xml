@@ -25,5 +25,8 @@
         <activity android:name=".admin.AdminLessonsActivity" android:exported="false" />
         <activity android:name=".admin.AdminQuizzesActivity" android:exported="false" />
         <activity android:name=".admin.AdminQuestionsActivity" android:exported="false" />
+        <activity android:name=".admin.AdminCreateQuizActivity" android:exported="false" />
+        <activity android:name=".quiz.QuizActivity" android:exported="false" />
+        <activity android:name=".quiz.QuizResultActivity" android:exported="false" />
     </application>
 </manifest>
