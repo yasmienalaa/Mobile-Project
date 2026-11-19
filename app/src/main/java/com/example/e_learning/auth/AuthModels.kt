@@ -14,6 +14,12 @@ object Level {
     const val ADVANCED = "ADVANCED"
 }
 
+object AdminAccount {
+    const val NAME = "Administrator"
+    const val EMAIL = "admin@elearning.com"
+    const val PASSWORD = "Admin@123"
+}
+
 sealed interface AuthState {
     data object Idle : AuthState
     data object Loading : AuthState

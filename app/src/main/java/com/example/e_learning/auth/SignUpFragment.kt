@@ -31,7 +31,6 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
                     fullName = binding.etName.text.toString(),
                     email = binding.etEmail.text.toString(),
                     password = binding.etPassword.text.toString(),
-                    role = fields.role,
                     level = fields.level,
                     languages = fields.languages
                 )

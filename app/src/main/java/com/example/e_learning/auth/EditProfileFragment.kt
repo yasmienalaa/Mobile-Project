@@ -25,7 +25,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         _binding = FragmentEditProfileBinding.bind(view)
-        val fields = ProfileFields(binding.profileFields).also { it.hideRoleSection() }
+        val fields = ProfileFields(binding.profileFields)
 
         vm.observeCurrentUser().observe(viewLifecycleOwner) { user ->
             currentUser = user ?: return@observe

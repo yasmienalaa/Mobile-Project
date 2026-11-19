@@ -4,18 +4,20 @@ import android.database.sqlite.SQLiteConstraintException
 import com.example.e_learning.dao.UserDao
 import com.example.e_learning.entities.UserEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class UserRepository(private val dao: UserDao) {
 
     suspend fun register(
         fullName: String, email: String, password: String,
-        role: String, level: String, languages: List<String>
+        level: String, languages: List<String>
     ): Result<UserEntity> {
         val user = UserEntity(
             fullName = fullName.trim(),
             email = email.trim().lowercase(),
             passwordHash = PasswordHasher.hash(password),
-            role = role,
+            role = Role.STUDENT,
             level = level,
             preferredLanguages = languages.toLanguagesJson()
         )
@@ -32,6 +34,24 @@ class UserRepository(private val dao: UserDao) {
             Result.success(user)
         else
             Result.failure(Exception("Invalid email or password"))
+    }
+
+    suspend fun ensureAdminExists() {
+        if (dao.findByEmail(AdminAccount.EMAIL) != null) return
+        val hash = withContext(Dispatchers.Default) { PasswordHasher.hash(AdminAccount.PASSWORD) }
+        try {
+            dao.insert(
+                UserEntity(
+                    fullName = AdminAccount.NAME,
+                    email = AdminAccount.EMAIL,
+                    passwordHash = hash,
+                    role = Role.ADMIN,
+                    level = Level.ADVANCED
+                )
+            )
+        } catch (e: SQLiteConstraintException) {
+            // Admin was created by another call, nothing to do
+        }
     }
 
     fun observeUser(id: Long): Flow<UserEntity?> = dao.observeById(id)

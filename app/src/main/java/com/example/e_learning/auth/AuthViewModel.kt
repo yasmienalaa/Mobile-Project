@@ -18,13 +18,16 @@ class AuthViewModel(app: Application) : AndroidViewModel(app) {
     private val _state = MutableLiveData<AuthState>(AuthState.Idle)
     val state: LiveData<AuthState> = _state
 
+    init {
+        viewModelScope.launch { repo.ensureAdminExists() }
+    }
+
     fun login(email: String, password: String) = authenticate { repo.login(email, password) }
 
     fun signUp(
         fullName: String, email: String, password: String,
-        role: String, level: String, languages: List<String>
-    ) = authenticate { repo.register(fullName, email, password, role, level, languages) }
-
+        level: String, languages: List<String>
+    ) = authenticate { repo.register(fullName, email, password, level, languages) }
     private fun authenticate(action: suspend () -> Result<UserEntity>) {
         viewModelScope.launch {
             _state.value = AuthState.Loading
