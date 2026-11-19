@@ -31,6 +31,9 @@ interface CourseDao {
     @Query("SELECT courses.* FROM courses INNER JOIN enrollments ON enrollments.courseId = courses.courseId WHERE enrollments.userId = :userId ORDER BY courses.title")
     fun observeEnrolledByUser(userId: Long): Flow<List<CourseEntity>>
 
+    @Query("SELECT courses.* FROM courses INNER JOIN enrollments ON enrollments.courseId = courses.courseId WHERE enrollments.userId = :userId ORDER BY courses.title")
+    suspend fun getEnrolledByUser(userId: Long): List<CourseEntity>
+
     @Query("SELECT COUNT(*) FROM courses")
     fun observeCount(): Flow<Int>
 }

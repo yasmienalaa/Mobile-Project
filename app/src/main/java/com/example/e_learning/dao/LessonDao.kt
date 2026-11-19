@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
     @Update suspend fun update(lesson: LessonEntity)
     @Delete suspend fun delete(lesson: LessonEntity)
     @Query("SELECT * FROM lessons WHERE courseId = :courseId ORDER BY position") fun observeByCourse(courseId: Long): Flow<List<LessonEntity>>
+    @Query("SELECT * FROM lessons WHERE courseId = :courseId ORDER BY position") suspend fun getLessonsForCourse(courseId: Long): List<LessonEntity>
     @Query("SELECT * FROM lessons WHERE lessonId = :id LIMIT 1") suspend fun getById(id: Long): LessonEntity?
     @Query("SELECT COUNT(*) FROM lessons") fun observeCount(): Flow<Int>
 }

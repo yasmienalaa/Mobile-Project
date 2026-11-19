@@ -13,6 +13,7 @@ import com.example.e_learning.admin.AdminLessonsActivity
 import com.example.e_learning.auth.Role
 import com.example.e_learning.auth.SessionManager
 import com.example.e_learning.data.CourseRepository
+import com.example.e_learning.data.ProgressRepository
 import com.example.e_learning.database.AppDatabase
 import com.example.e_learning.entities.CourseEntity
 import com.example.e_learning.entities.UserEntity
@@ -20,9 +21,11 @@ import com.example.e_learning.ui.AdminCoursesScreen
 import com.example.e_learning.ui.AdminStudentsScreen
 import com.example.e_learning.ui.CourseDialogs
 import com.example.e_learning.ui.StudentCoursesScreen
+import com.example.e_learning.ui.StudentDashboardScreen
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var repository: CourseRepository
+    private lateinit var progressRepository: ProgressRepository
     private lateinit var dialogs: CourseDialogs
     private lateinit var database: AppDatabase
     private var isAdmin = false
@@ -31,6 +34,7 @@ class HomeActivity : AppCompatActivity() {
     private var currentStudent: UserEntity? = null
     private var currentAdmin: UserEntity? = null
     private var studentScreen: StudentCoursesScreen? = null
+    private var dashboardScreen: StudentDashboardScreen? = null
     private var adminScreen: AdminCoursesScreen? = null
     private var adminStudentsScreen: AdminStudentsScreen? = null
 
@@ -49,6 +53,7 @@ class HomeActivity : AppCompatActivity() {
         window.navigationBarColor = getColor(R.color.sage_background)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
         database = AppDatabase.getInstance(this)
+        progressRepository = ProgressRepository(database)
         if (!::repository.isInitialized) {
             repository = CourseRepository(applicationContext, database)
         }
@@ -152,18 +157,16 @@ class HomeActivity : AppCompatActivity() {
                         openCourseOrEnroll(course, enrolled)
                     }
                     adminScreen = null
+                    dashboardScreen = null
                     screenContainer.addView(studentScreen!!.createView())
                 }
-                ENROLLED_TAB -> {
-                    studentScreen = StudentCoursesScreen(this, R.layout.screen_enrolled_courses) { course, enrolled ->
-                        openCourseOrEnroll(course, enrolled)
-                    }
-                    adminScreen = null
-                    screenContainer.addView(studentScreen!!.createView())
-                }
-                PROFILE_TAB -> {
+                ENROLLED_TAB, PROFILE_TAB -> {
                     studentScreen = null
                     adminScreen = null
+                    dashboardScreen = StudentDashboardScreen(this) { course ->
+                        openCourseOrEnroll(course, true)
+                    }
+                    screenContainer.addView(dashboardScreen!!.createView())
                 }
             }
         }
@@ -239,15 +242,19 @@ class HomeActivity : AppCompatActivity() {
             return
         }
         val studentId = currentStudent?.userId ?: return
+        if (selectedTab == ENROLLED_TAB || selectedTab == PROFILE_TAB) {
+            progressRepository.loadStudentSummary(studentId) { result ->
+                result.onSuccess { summary -> dashboardScreen?.render(summary) }
+                    .onFailure { showLoadError() }
+            }
+            return
+        }
         repository.loadCourses { allResult ->
             allResult.onSuccess { allCourses ->
                 repository.loadEnrolledCourses(studentId) { enrolledResult ->
                     enrolledResult.onSuccess { enrolledCourses ->
                         val enrolledIds = enrolledCourses.map { it.courseId }.toSet()
-                        studentScreen?.render(
-                            if (selectedTab == ENROLLED_TAB) enrolledCourses else allCourses,
-                            enrolledIds
-                        )
+                        studentScreen?.render(allCourses, enrolledIds)
                     }.onFailure { showLoadError() }
                 }
             }.onFailure { showLoadError() }
