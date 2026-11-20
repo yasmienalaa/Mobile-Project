@@ -216,12 +216,20 @@ class HomeActivity : AppCompatActivity() {
             return
         }
         val studentId = currentStudent?.userId ?: return
-        if (selectedTab == ENROLLED_TAB || selectedTab == PROFILE_TAB) {
-            progressRepository.loadStudentSummary(studentId) { result ->
-                result.onSuccess { summary -> dashboardScreen?.render(summary) }
-                    .onFailure { showLoadError() }
+
+        repository.loadCourses { allResult ->
+            allResult.onSuccess { allCourses ->
+                repository.loadEnrolledCourses(studentId) { enrolledResult ->
+                    enrolledResult.onSuccess { enrolledCourses ->
+                        val enrolledIds = enrolledCourses.map { it.courseId }.toSet()
+                        studentScreen?.render(allCourses, enrolledIds)
+                    }.onFailure {
+                        showLoadError()
+                    }
+                }
+            }.onFailure {
+                showLoadError()
             }
-            return
         }
         repository.loadCourses { allResult ->
             allResult.onSuccess { allCourses ->
