@@ -18,7 +18,6 @@ data class AdminStats(
     val totalLessons: Int,
     val totalStudents: Int
 )
-
 data class StudentSummary(
     val userId: Long,
     val fullName: String,
@@ -26,7 +25,6 @@ data class StudentSummary(
     val level: String,
     val enrolledCoursesCount: Int
 )
-
 class CourseRepository(context: Context, private val database: AppDatabase) {
     private val appContext = context.applicationContext
     private val io = Executors.newSingleThreadExecutor()
@@ -36,7 +34,6 @@ class CourseRepository(context: Context, private val database: AppDatabase) {
     fun setActiveUserId(userId: Long) {
         preferences.edit().putLong(ACTIVE_USER_ID, userId).apply()
     }
-
     fun loadCurrentStudent(onComplete: (Result<UserEntity>) -> Unit) {
         io.execute {
             val result = runCatching {
@@ -54,14 +51,12 @@ class CourseRepository(context: Context, private val database: AppDatabase) {
             }
         }
     }
-
     fun loadCourses(onComplete: (Result<List<CourseEntity>>) -> Unit) {
         io.execute {
             val result = runCatching { runBlocking { database.courseDao().observeAll().first() } }
             main.post { onComplete(result) }
         }
     }
-
     fun loadAdminStats(onComplete: (Result<AdminStats>) -> Unit) {
         io.execute {
             val result = runCatching {
@@ -75,7 +70,6 @@ class CourseRepository(context: Context, private val database: AppDatabase) {
             main.post { onComplete(result) }
         }
     }
-
     fun loadStudentsSummary(onComplete: (Result<List<StudentSummary>>) -> Unit) {
         io.execute {
             val result = runCatching {
@@ -96,7 +90,6 @@ class CourseRepository(context: Context, private val database: AppDatabase) {
             main.post { onComplete(result) }
         }
     }
-
     fun loadEnrolledCourses(userId: Long, onComplete: (Result<List<CourseEntity>>) -> Unit) {
         io.execute {
             val result = runCatching { runBlocking { database.courseDao().observeEnrolledByUser(userId).first() } }
