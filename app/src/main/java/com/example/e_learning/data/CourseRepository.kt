@@ -42,38 +42,16 @@ class CourseRepository(context: Context, private val database: AppDatabase) {
             val result = runCatching {
                 runBlocking {
                     val savedId = preferences.getLong(ACTIVE_USER_ID, INVALID_USER_ID)
-                    val savedStudent = if (savedId == INVALID_USER_ID) null else database.userDao().findById(savedId)
-                    savedStudent?.takeIf { it.role.equals("STUDENT", ignoreCase = true) }
-                        ?: database.userDao().findFirstStudent()
-                }
-            }
-            result.onSuccess { student ->
-                if (student != null) preferences.edit().putLong(ACTIVE_USER_ID, student.userId).apply()
-            }
-            main.post { onComplete(result.mapCatching { it ?: error("No student profile found.") }) }
-        }
-    }
+                    require(savedId != INVALID_USER_ID) { "No signed-in student session found." }
 
-    fun loadCurrentAdmin(onComplete: (Result<UserEntity>) -> Unit) {
-        io.execute {
-            val result = runCatching {
-                runBlocking {
-                    database.userDao().findFirstAdmin() ?: createDemoAdmin()
+                    database.userDao().findById(savedId)?.takeIf {
+                            it.role.equals("STUDENT", ignoreCase = true) }
+                        ?: error("The signed-in account is not a student.")
                 }
             }
-            main.post { onComplete(result) }
-        }
-    }
-
-    fun validateAdminRole(userId: Long, onComplete: (Result<Boolean>) -> Unit) {
-        io.execute {
-            val result = runCatching {
-                runBlocking {
-                    val user = database.userDao().findById(userId)
-                    user?.role?.equals("ADMIN", ignoreCase = true) == true
-                }
+            main.post {
+                onComplete(result)
             }
-            main.post { onComplete(result) }
         }
     }
 
@@ -306,20 +284,6 @@ class CourseRepository(context: Context, private val database: AppDatabase) {
             main.post { onComplete(result) }
         }
     }
-
-
-    private suspend fun createDemoAdmin(): UserEntity {
-        val id = database.userDao().insert(
-            UserEntity(
-                fullName = "System Admin",
-                email = "admin@local.elearning",
-                passwordHash = "",
-                role = "ADMIN"
-            )
-        )
-        return database.userDao().findById(id) ?: error("Couldn't create the local admin profile.")
-    }
-
 
     companion object {
         const val SESSION_PREFERENCES = "student_session"
